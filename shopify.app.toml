@@ -1,17 +1,16 @@
 name = "Dinamik Fiyat Hesaplayıcı"
-client_id = "your_client_id_here"
-application_url = "https://your-app-domain.com"
+client_id = "ace3bfc493ea0b4df835573bd32b189d"
+application_url = "http://localhost:3000"
 embedded = true
 
 [access_scopes]
-# Read and write products
 scopes = "read_products,write_products,read_themes,write_themes,read_orders,write_orders"
 
 [auth]
 redirect_urls = [
-  "https://your-app-domain.com/auth/callback",
-  "https://your-app-domain.com/auth/shopify/callback",
-  "https://your-app-domain.com/api/auth/callback"
+  "http://localhost:3000/auth/callback",
+  "http://localhost:3000/auth/shopify/callback",
+  "http://localhost:3000/api/auth/callback"
 ]
 
 [webhooks]
@@ -22,4 +21,4 @@ embedded = false
 
 [build]
 automatically_update_urls_on_dev = true
-dev_store_url = "your-dev-store.myshopify.com"
+dev_store_url = "dynamic-pricing-test-store.myshopify.com"

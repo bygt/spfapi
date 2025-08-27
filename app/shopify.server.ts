@@ -33,4 +33,6 @@ const shopify = shopifyApp({
   },
 });
 
+// Export the shopify instance and authenticate function
 export default shopify;
+export const authenticate = shopify.authenticate;
