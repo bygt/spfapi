@@ -1,352 +1,283 @@
-# SPF API - E-ticaret Backend
+# Dinamik Fiyat Hesaplayıcı - Shopify App
 
-Modern e-ticaret uygulaması için Node.js, GraphQL ve MongoDB kullanarak geliştirilmiş backend API.
+Bu proje, Shopify mağazalarında ürün sayfalarındaki klasik varyant seçiciyi kaldırıp, kullanıcıdan boy, en ve materyal bilgilerini alarak dinamik fiyat hesaplayan ve geçici ürünler oluşturan bir Remix uygulamasıdır.
 
 ## 🚀 Özellikler
 
-- **GraphQL API** - Apollo Server ile modern API tasarımı
-- **MongoDB** - Mongoose ODM ile veritabanı yönetimi
-- **JWT Authentication** - Güvenli kullanıcı kimlik doğrulama
-- **Role-based Access Control** - Kullanıcı rolleri ve yetkilendirme
-- **Comprehensive Models** - User, Product, Category, Order modelleri
-- **Security Features** - Helmet, CORS, Rate Limiting
-- **Scalable Architecture** - Modüler ve genişletilebilir yapı
+- **Dinamik Fiyat Hesaplama**: Boy, en ve materyal seçimine göre otomatik fiyat hesaplama
+- **Geçici Ürün Oluşturma**: Seçimlere göre otomatik ürün varyantı oluşturma
+- **Otomatik Temizlik**: 2 saat sonra geçici ürünleri otomatik silme
+- **Tema Entegrasyonu**: Shopify temalarına kolay entegrasyon
+- **Responsive Tasarım**: Mobil ve masaüstü uyumlu arayüz
+- **Gerçek Zamanlı Hesaplama**: Anlık fiyat güncellemeleri
 
 ## 🛠️ Teknolojiler
 
-- **Node.js** - JavaScript runtime
-- **Express.js** - Web framework
-- **Apollo Server** - GraphQL server
-- **MongoDB** - NoSQL veritabanı
-- **Mongoose** - MongoDB ODM
-- **JWT** - JSON Web Tokens
-- **bcryptjs** - Password hashing
-- **GraphQL** - Query language
+- **Frontend**: React, Remix, TypeScript
+- **Styling**: Tailwind CSS
+- **Backend**: Node.js, Remix
+- **Shopify API**: Shopify Admin API, Product API
+- **Database**: In-memory storage (production için veritabanı entegrasyonu mevcut)
 
-## 📁 Proje Yapısı
+## 📋 Gereksinimler
 
-```
-spfapi/
-├── src/
-│   ├── config/
-│   │   └── database.js          # MongoDB bağlantı konfigürasyonu
-│   ├── models/
-│   │   ├── User.js              # Kullanıcı modeli
-│   │   ├── Product.js           # Ürün modeli
-│   │   ├── Category.js          # Kategori modeli
-│   │   └── Order.js             # Sipariş modeli
-│   ├── graphql/
-│   │   ├── schema.js            # GraphQL şeması
-│   │   └── resolvers.js         # GraphQL resolver'ları
-│   └── server.js                # Ana server dosyası
-├── package.json                  # Proje bağımlılıkları
-└── README.md                     # Proje dokümantasyonu
-```
+- Node.js 18.0.0 veya üzeri
+- npm veya yarn
+- Shopify Partner hesabı
+- Shopify Development Store
 
 ## 🚀 Kurulum
 
-### Gereksinimler
-
-- Node.js (v18 veya üzeri)
-- MongoDB (local veya cloud)
-- npm veya yarn
-
-### 1. Projeyi klonlayın
+### 1. Projeyi Klonlayın
 
 ```bash
 git clone <repository-url>
 cd spfapi
 ```
 
-### 2. Bağımlılıkları yükleyin
+### 2. Bağımlılıkları Yükleyin
 
 ```bash
 npm install
 ```
 
-### 3. Environment değişkenlerini ayarlayın
+### 3. Ortam Değişkenlerini Ayarlayın
 
-`.env` dosyası oluşturun:
+```bash
+cp env.example .env
+```
+
+`.env` dosyasını düzenleyerek Shopify API bilgilerinizi ekleyin:
 
 ```env
-# Server Configuration
-PORT=4000
-NODE_ENV=development
-
-# MongoDB Configuration
-MONGODB_URI=mongodb://localhost:27017/spfapi
-
-# JWT Configuration
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-JWT_EXPIRES_IN=7d
-
-# Security
-BCRYPT_SALT_ROUNDS=12
-RATE_LIMIT_WINDOW_MS=900000
-RATE_LIMIT_MAX_REQUESTS=100
+SHOPIFY_API_KEY=your_api_key_here
+SHOPIFY_API_SECRET=your_api_secret_here
+SHOPIFY_APP_URL=https://your-app-domain.com
 ```
 
-### 4. MongoDB'yi başlatın
+### 4. Shopify Partner Hesabında Uygulama Oluşturun
 
-Local MongoDB:
-```bash
-mongod
-```
+1. [Shopify Partners](https://partners.shopify.com) hesabınıza giriş yapın
+2. "Apps" > "Create app" seçin
+3. App name: "Dinamik Fiyat Hesaplayıcı"
+4. App URL: Uygulamanızın domain'i
+5. Allowed redirection URLs ekleyin
 
-Veya MongoDB Atlas kullanın.
+### 5. Uygulamayı Çalıştırın
 
-### 5. Uygulamayı başlatın
-
-Development mode:
 ```bash
 npm run dev
 ```
 
-Production mode:
-```bash
-npm start
+## 🔧 Konfigürasyon
+
+### Shopify App Ayarları
+
+`shopify.app.toml` dosyasını düzenleyin:
+
+```toml
+name = "Dinamik Fiyat Hesaplayıcı"
+client_id = "your_client_id_here"
+application_url = "https://your-app-domain.com"
+embedded = true
+
+[access_scopes]
+scopes = "read_products,write_products,read_themes,write_themes,read_orders,write_orders"
 ```
 
-## 📚 API Kullanımı
+### Fiyat Hesaplama Katsayıları
 
-### GraphQL Endpoint
+`app/routes/api.pricing.ts` dosyasında fiyat hesaplama mantığını özelleştirebilirsiniz:
 
-```
-http://localhost:4000/graphql
-```
-
-### Health Check
-
-```
-GET http://localhost:4000/health
-```
-
-## 🔐 Authentication
-
-API'yi kullanmak için JWT token gereklidir. Header'da şu şekilde gönderin:
-
-```
-Authorization: Bearer <your-jwt-token>
+```typescript
+const PRICING_DATA = {
+  dimensions: {
+    "100-200": { min: 0, max: 20000, coefficient: 1.0, label: "100-200 cm²" },
+    "201-400": { min: 20001, max: 80000, coefficient: 1.5, label: "201-400 cm²" },
+    // ... diğer boyut aralıkları
+  },
+  materials: {
+    "ahşap": 50,
+    "cam": 80,
+    "metal": 120,
+    // ... diğer materyaller
+  },
+};
 ```
 
-### Kullanıcı Kaydı
+## 🎨 Tema Entegrasyonu
 
-```graphql
-mutation {
-  register(input: {
-    email: "user@example.com"
-    password: "password123"
-    firstName: "John"
-    lastName: "Doe"
-    phone: "+905551234567"
-  }) {
-    token
-    user {
-      _id
-      email
-      firstName
-      lastName
-    }
-  }
+### 1. App Block Ekleme
+
+1. Shopify Admin > Online Store > Themes
+2. "Customize" butonuna tıklayın
+3. Product template'i seçin
+4. "Add block" > "Apps" > "Dinamik Fiyat Hesaplayıcı"
+5. Bloğu istediğiniz konuma sürükleyin
+
+### 2. Mevcut Varyant Seçiciyi Gizleme
+
+CSS ile mevcut varyant seçiciyi gizleyin:
+
+```css
+.product-form__variants,
+.product-form__input,
+.product-form__buttons {
+  display: none !important;
 }
 ```
 
-### Giriş
+### 3. App Block Özelleştirme
 
-```graphql
-mutation {
-  login(email: "user@example.com", password: "password123") {
-    token
-    user {
-      _id
-      email
-      firstName
-      lastName
-    }
-  }
+`app/blocks/product-form.liquid` dosyasını düzenleyerek görünümü özelleştirebilirsiniz.
+
+## 📊 API Endpoints
+
+### Fiyat Hesaplama
+
+```http
+POST /api/pricing
+Content-Type: application/json
+
+{
+  "width": 400,
+  "height": 500,
+  "material": "ahşap"
 }
 ```
 
-## 🛍️ E-ticaret İşlemleri
+### Ürün Oluşturma
 
-### Ürün Listesi
+```http
+POST /api/create-product
+Content-Type: application/json
 
-```graphql
-query {
-  products(
-    category: "category-id"
-    status: active
-    featured: true
-    limit: 20
-    offset: 0
-  ) {
-    products {
-      _id
-      name
-      price
-      description
-      images {
-        url
-        alt
-      }
-      category {
-        name
-        slug
-      }
-    }
-    totalCount
-    hasNextPage
-    hasPreviousPage
-  }
+{
+  "width": 400,
+  "height": 500,
+  "material": "ahşap",
+  "price": 150
 }
 ```
 
-### Kategori Ağacı
+### Temizlik
 
-```graphql
-query {
-  categoryTree {
-    _id
-    name
-    slug
-    children {
-      _id
-      name
-      slug
-      children {
-        _id
-        name
-        slug
-      }
-    }
-  }
-}
+```http
+POST /api/cleanup
 ```
 
-### Sipariş Oluşturma
+## 🔄 Otomatik Temizlik Sistemi
 
-```graphql
-mutation {
-  createOrder(input: {
-    user: "user-id"
-    items: [{
-      product: "product-id"
-      quantity: 2
-      price: 99.99
-    }]
-    billingAddress: {
-      type: home
-      street: "123 Main St"
-      city: "Istanbul"
-      state: "Istanbul"
-      postalCode: "34000"
-      country: "Turkey"
-      isDefault: true
-    }
-    shippingAddress: {
-      type: home
-      street: "123 Main St"
-      city: "Istanbul"
-      state: "Istanbul"
-      postalCode: "34000"
-      country: "Turkey"
-      isDefault: true
-    }
-    payment: {
-      method: credit_card
-    }
-  }) {
-    _id
-    orderNumber
-    total
-    status
-    items {
-      product {
-        name
-        price
-      }
-      quantity
-      total
-    }
-  }
-}
-```
+Uygulama, 2 saat sonra geçici ürünleri otomatik olarak siler:
 
-## 🔧 Geliştirme
+- **Zamanlayıcı**: Her 5 dakikada bir çalışır
+- **Filtreleme**: `geçici` etiketi ve `expires_at` metafield'ına göre
+- **Güvenlik**: Siparişe girmiş ürünler de silinir (sipariş kaydı korunur)
 
-### Yeni Model Ekleme
+## 📱 Kullanım
 
-1. `src/models/` klasöründe yeni model dosyası oluşturun
-2. `src/graphql/schema.js`'e GraphQL tiplerini ekleyin
-3. `src/graphql/resolvers.js`'e resolver'ları ekleyin
+### 1. Ürün Sayfasında
 
-### Test
+1. Kullanıcı boy, en ve materyal seçer
+2. Fiyat otomatik hesaplanır
+3. "Sepete Ekle" butonuna tıklar
+4. Geçici ürün oluşturulur ve sepete eklenir
+
+### 2. Admin Paneli
+
+- Uygulama ana sayfası: `/app`
+- Geçici ürün listesi: `/api/cleanup` (GET)
+- Manuel temizlik: `/api/cleanup` (POST)
+
+## 🚨 Hata Yönetimi
+
+- **Validasyon**: Boyut ve materyal kontrolü
+- **API Hataları**: Shopify API hatalarını yakalama
+- **Kullanıcı Geri Bildirimi**: Net hata mesajları
+- **Loglama**: Detaylı log kayıtları
+
+## 🔒 Güvenlik
+
+- **Shopify Authentication**: OAuth 2.0 ile güvenli erişim
+- **API Key Protection**: Environment variables ile koruma
+- **Input Validation**: Kullanıcı girdisi validasyonu
+- **Rate Limiting**: API çağrı limitleri
+
+## 📈 Performans
+
+- **Lazy Loading**: Gereksiz veri yüklemeyi önleme
+- **Caching**: Fiyat hesaplama sonuçlarını önbellekleme
+- **Optimized Queries**: Shopify API çağrılarını optimize etme
+- **Background Processing**: Temizlik işlemlerini arka planda yapma
+
+## 🧪 Test
+
+### Manuel Test
+
+1. Uygulamayı development store'a kurun
+2. Ürün sayfasında form'u test edin
+3. Farklı boyut ve materyal kombinasyonları deneyin
+4. Sepete ekleme işlemini test edin
+5. 2 saat sonra otomatik silme işlemini kontrol edin
+
+### API Test
 
 ```bash
-npm test
-```
+# Fiyat hesaplama testi
+curl -X POST http://localhost:3000/api/pricing \
+  -H "Content-Type: application/json" \
+  -d '{"width": 400, "height": 500, "material": "ahşap"}'
 
-### Linting
-
-```bash
-npm run lint
+# Temizlik testi
+curl -X POST http://localhost:3000/api/cleanup
 ```
 
 ## 🚀 Production Deployment
 
-### Environment Variables
+### 1. Hosting
 
-Production için güvenli environment değişkenleri ayarlayın:
+- **Vercel**: Remix uygulamaları için önerilen
+- **Netlify**: Kolay deployment
+- **AWS/GCP**: Özel sunucu çözümleri
+
+### 2. Environment Variables
+
+Production ortamında gerekli değişkenleri ayarlayın:
 
 ```env
 NODE_ENV=production
-JWT_SECRET=very-long-random-secret-key
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/spfapi
+SHOPIFY_API_KEY=your_production_api_key
+SHOPIFY_API_SECRET=your_production_api_secret
+SHOPIFY_APP_URL=https://your-production-domain.com
 ```
 
-### PM2 ile Deployment
+### 3. Database
 
-```bash
-npm install -g pm2
-pm2 start src/server.js --name "spfapi"
-pm2 save
-pm2 startup
+Production için veritabanı entegrasyonu:
+
+```typescript
+// PostgreSQL, MySQL veya MongoDB entegrasyonu
+import { Pool } from 'pg';
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 ```
 
-### Docker ile Deployment
+## 📝 Log ve İzleme
 
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-EXPOSE 4000
-CMD ["npm", "start"]
-```
+### Log Seviyeleri
 
-## 📊 Monitoring ve Logging
+- **INFO**: Normal işlemler
+- **WARN**: Uyarılar
+- **ERROR**: Hatalar
+- **DEBUG**: Geliştirme bilgileri
 
-### Health Check
+### Metrikler
 
-Uygulama sağlığını kontrol etmek için:
-
-```
-GET /health
-```
-
-### Logs
-
-Uygulama logları console'da görüntülenir. Production'da log dosyalarına yönlendirin.
-
-## 🔒 Güvenlik
-
-- **JWT Authentication** - Güvenli token tabanlı kimlik doğrulama
-- **Password Hashing** - bcrypt ile şifre hashleme
-- **Rate Limiting** - API abuse koruması
-- **CORS** - Cross-origin request koruması
-- **Helmet** - Security headers
-- **Input Validation** - GraphQL input validation
+- Geçici ürün oluşturma sayısı
+- Silinen ürün sayısı
+- API response time
+- Hata oranları
 
 ## 🤝 Katkıda Bulunma
 
@@ -356,21 +287,31 @@ Uygulama logları console'da görüntülenir. Production'da log dosyalarına yö
 4. Push yapın (`git push origin feature/amazing-feature`)
 5. Pull Request oluşturun
 
-## 📝 License
+## 📄 Lisans
 
 Bu proje MIT lisansı altında lisanslanmıştır.
 
-## 📞 İletişim
+## 🆘 Destek
 
-Proje hakkında sorularınız için issue açın veya iletişime geçin.
+- **Dokümantasyon**: Bu README dosyası
+- **Issues**: GitHub Issues
+- **Shopify Docs**: [Shopify App Development](https://shopify.dev/apps)
 
-## 🎯 Roadmap
+## 🔄 Güncellemeler
 
-- [ ] File upload sistemi
-- [ ] Email notifications
-- [ ] Payment gateway entegrasyonu
-- [ ] Real-time notifications (WebSocket)
-- [ ] Admin dashboard
-- [ ] Analytics ve reporting
-- [ ] Multi-language support
-- [ ] Mobile app API endpoints
+### v1.0.0
+- İlk sürüm
+- Temel dinamik fiyat hesaplama
+- Geçici ürün oluşturma
+- Otomatik temizlik sistemi
+
+### Gelecek Özellikler
+- Çoklu dil desteği
+- Gelişmiş fiyat algoritmaları
+- Bulk ürün oluşturma
+- Analytics dashboard
+- Email bildirimleri
+
+---
+
+**Not**: Bu uygulama Shopify Partner programı kapsamında geliştirilmiştir. Kullanım öncesi Shopify'ın güncel API dokümantasyonunu kontrol ediniz.

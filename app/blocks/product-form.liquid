@@ -1,0 +1,389 @@
+{% comment %}
+  Dinamik Fiyat Hesaplayıcı App Block
+  Bu blok ürün sayfasına eklenerek dinamik fiyat hesaplama formunu gösterir
+{% endcomment %}
+
+<div class="dynamic-pricing-app" 
+     data-shop="{{ shop.permanent_domain }}"
+     data-product-id="{{ product.id }}"
+     data-product-title="{{ product.title | escape }}">
+  
+  <div class="dynamic-pricing-container">
+    <h3 class="dynamic-pricing-title">Özel Boyut Seçimi</h3>
+    
+    <div class="dynamic-pricing-form">
+      <!-- Boyut Seçimi -->
+      <div class="dimension-inputs">
+        <div class="input-group">
+          <label for="width-input">Genişlik (cm)</label>
+          <input type="number" 
+                 id="width-input" 
+                 min="1" 
+                 max="1000" 
+                 placeholder="Genişlik"
+                 class="dimension-input">
+        </div>
+        
+        <div class="input-group">
+          <label for="height-input">Yükseklik (cm)</label>
+          <input type="number" 
+                 id="height-input" 
+                 min="1" 
+                 max="1000" 
+                 placeholder="Yükseklik"
+                 class="dimension-input">
+        </div>
+      </div>
+      
+      <!-- Materyal Seçimi -->
+      <div class="material-selection">
+        <label for="material-select">Materyal</label>
+        <select id="material-select" class="material-select">
+          <option value="">Materyal seçin</option>
+          <option value="ahşap">Ahşap</option>
+          <option value="cam">Cam</option>
+          <option value="metal">Metal</option>
+          <option value="plastik">Plastik</option>
+          <option value="mdf">MDF</option>
+          <option value="sunta">Sunta</option>
+        </select>
+      </div>
+      
+      <!-- Fiyat Gösterimi -->
+      <div id="price-display" class="price-display" style="display: none;">
+        <div class="price-label">Tahmini Fiyat</div>
+        <div class="price-amount" id="price-amount">0 TL</div>
+        <div class="price-details" id="price-details"></div>
+      </div>
+      
+      <!-- Hata Mesajı -->
+      <div id="error-message" class="error-message" style="display: none;"></div>
+      
+      <!-- Sepete Ekle Butonu -->
+      <button id="add-to-cart-btn" 
+              class="add-to-cart-button" 
+              disabled>
+        Sepete Ekle
+      </button>
+      
+      <!-- Yükleniyor Göstergesi -->
+      <div id="loading-indicator" class="loading-indicator" style="display: none;">
+        <span class="loading-spinner"></span>
+        Ürün oluşturuluyor...
+      </div>
+    </div>
+    
+    <!-- Bilgi Notları -->
+    <div class="info-notes">
+      <p>• Oluşturulan ürünler 2 saat sonra otomatik olarak silinir</p>
+      <p>• Fiyatlar tahmini olup, nihai fiyat sipariş sırasında doğrulanır</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .dynamic-pricing-app {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background-color: #f9fafb;
+  }
+  
+  .dynamic-pricing-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  
+  .dynamic-pricing-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .dimension-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  
+  .input-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .input-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+  
+  .dimension-input,
+  .material-select {
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  
+  .dimension-input:focus,
+  .material-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  
+  .price-display {
+    text-align: center;
+    padding: 1rem;
+    background-color: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+  }
+  
+  .price-label {
+    font-size: 0.875rem;
+    color: #065f46;
+    margin-bottom: 0.5rem;
+  }
+  
+  .price-amount {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #059669;
+  }
+  
+  .price-details {
+    font-size: 0.875rem;
+    color: #047857;
+    margin-top: 0.5rem;
+  }
+  
+  .error-message {
+    padding: 0.75rem;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 0.375rem;
+    color: #dc2626;
+    font-size: 0.875rem;
+  }
+  
+  .add-to-cart-button {
+    padding: 0.875rem 1.5rem;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .add-to-cart-button:hover:not(:disabled) {
+    background-color: #2563eb;
+  }
+  
+  .add-to-cart-button:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+  }
+  
+  .loading-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+  
+  .loading-spinner {
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid #e5e7eb;
+    border-top: 2px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .info-notes {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 0.375rem;
+  }
+  
+  .info-notes p {
+    font-size: 0.875rem;
+    color: #1e40af;
+    margin: 0.25rem 0;
+  }
+  
+  @media (max-width: 768px) {
+    .dimension-inputs {
+      grid-template-columns: 1fr;
+    }
+    
+    .dynamic-pricing-app {
+      padding: 1rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const app = new DynamicPricingApp();
+    app.init();
+  });
+  
+  class DynamicPricingApp {
+    constructor() {
+      this.widthInput = document.getElementById('width-input');
+      this.heightInput = document.getElementById('height-input');
+      this.materialSelect = document.getElementById('material-select');
+      this.priceDisplay = document.getElementById('price-display');
+      this.priceAmount = document.getElementById('price-amount');
+      this.priceDetails = document.getElementById('price-details');
+      this.errorMessage = document.getElementById('error-message');
+      this.addToCartBtn = document.getElementById('add-to-cart-btn');
+      this.loadingIndicator = document.getElementById('loading-indicator');
+      
+      this.currentPrice = null;
+      this.shopDomain = document.querySelector('.dynamic-pricing-app').dataset.shop;
+      this.productId = document.querySelector('.dynamic-pricing-app').dataset.productId;
+    }
+    
+    init() {
+      this.bindEvents();
+      this.updateFormState();
+    }
+    
+    bindEvents() {
+      this.widthInput.addEventListener('input', () => this.calculatePrice());
+      this.heightInput.addEventListener('input', () => this.calculatePrice());
+      this.materialSelect.addEventListener('change', () => this.calculatePrice());
+      this.addToCartBtn.addEventListener('click', () => this.addToCart());
+    }
+    
+    calculatePrice() {
+      const width = parseInt(this.widthInput.value) || 0;
+      const height = parseInt(this.heightInput.value) || 0;
+      const material = this.materialSelect.value;
+      
+      if (width && height && material) {
+        // Fiyat hesaplama (basit algoritma)
+        const area = width * height;
+        let coefficient = 1.0;
+        
+        if (area <= 20000) coefficient = 1.0;
+        else if (area <= 80000) coefficient = 1.5;
+        else if (area <= 240000) coefficient = 2.0;
+        else if (area <= 480000) coefficient = 2.5;
+        else coefficient = 3.0;
+        
+        const materialPrices = {
+          'ahşap': 50, 'cam': 80, 'metal': 120, 
+          'plastik': 30, 'mdf': 40, 'sunta': 25
+        };
+        
+        const materialPrice = materialPrices[material] || 0;
+        const basePrice = 25;
+        const totalPrice = Math.round((basePrice + materialPrice) * coefficient);
+        
+        this.currentPrice = totalPrice;
+        this.showPrice(totalPrice, width, height, area, coefficient);
+        this.updateFormState();
+      } else {
+        this.hidePrice();
+        this.updateFormState();
+      }
+    }
+    
+    showPrice(price, width, height, area, coefficient) {
+      this.priceAmount.textContent = `${price} TL`;
+      this.priceDetails.textContent = `Alan: ${width} × ${height} = ${area} cm²`;
+      this.priceDisplay.style.display = 'block';
+      this.errorMessage.style.display = 'none';
+    }
+    
+    hidePrice() {
+      this.priceDisplay.style.display = 'none';
+      this.currentPrice = null;
+    }
+    
+    updateFormState() {
+      const hasValidInputs = this.widthInput.value && 
+                             this.heightInput.value && 
+                             this.materialSelect.value &&
+                             this.currentPrice;
+      
+      this.addToCartBtn.disabled = !hasValidInputs;
+    }
+    
+    async addToCart() {
+      if (!this.currentPrice) return;
+      
+      this.showLoading(true);
+      this.hideError();
+      
+      try {
+        // Burada gerçek API çağrısı yapılacak
+        // Şimdilik simüle ediyoruz
+        await this.simulateProductCreation();
+        
+        this.showSuccess();
+        this.resetForm();
+        
+      } catch (error) {
+        this.showError('Ürün oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.');
+      } finally {
+        this.showLoading(false);
+      }
+    }
+    
+    async simulateProductCreation() {
+      return new Promise((resolve) => {
+        setTimeout(resolve, 2000);
+      });
+    }
+    
+    showLoading(show) {
+      this.loadingIndicator.style.display = show ? 'flex' : 'none';
+      this.addToCartBtn.style.display = show ? 'none' : 'block';
+    }
+    
+    showError(message) {
+      this.errorMessage.textContent = message;
+      this.errorMessage.style.display = 'block';
+    }
+    
+    hideError() {
+      this.errorMessage.style.display = 'none';
+    }
+    
+    showSuccess() {
+      alert(`Ürün başarıyla oluşturuldu! Fiyat: ${this.currentPrice} TL`);
+    }
+    
+    resetForm() {
+      this.widthInput.value = '';
+      this.heightInput.value = '';
+      this.materialSelect.value = '';
+      this.hidePrice();
+      this.updateFormState();
+    }
+  }
+</script>
