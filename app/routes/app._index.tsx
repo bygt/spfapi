@@ -117,6 +117,18 @@ export default function Index() {
               >
                 🧹 Manuel Temizlik
               </a>
+              <a
+                href="/api/scheduler"
+                className="bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors text-center"
+              >
+                ⏰ Zamanlayıcı Durumu
+              </a>
+              <a
+                href="/api/error-handler"
+                className="bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 transition-colors text-center"
+              >
+                🚨 Hata Yönetimi
+              </a>
             </div>
           </div>
 

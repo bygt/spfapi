@@ -7796,18 +7796,263 @@ var action = async ({ request: request2 }) => {
   }
 };
 
-// app/routes/api.cleanup.ts
-var api_cleanup_exports = {};
-__export(api_cleanup_exports, {
-  action: () => action2,
-  loader: () => loader
+// app/routes/api.error-handler.ts
+var api_error_handler_exports = {};
+__export(api_error_handler_exports, {
+  action: () => action2
 });
 var import_node2 = require("@remix-run/node");
-var action2 = async ({ request: request2 }) => {
+var requestCache = /* @__PURE__ */ new Map(), CACHE_TTL = 5 * 60 * 1e3, MAX_RETRIES = 3, action2 = async ({ request: request2 }) => {
   try {
     let { admin } = await authenticate.admin(request2);
     if (request2.method !== "POST")
       return (0, import_node2.json)({ success: !1, error: "Method not allowed" }, { status: 405 });
+    let body = await request2.json(), { errorType, context, userMessage } = body, requestKey = `${errorType}_${JSON.stringify(context)}`, now = Date.now(), cached = requestCache.get(requestKey);
+    if (cached && now - cached.timestamp < CACHE_TTL) {
+      if (cached.count++, cached.count > MAX_RETRIES)
+        return logger2.warning(`Maximum retry count exceeded: ${errorType}`, {
+          errorType,
+          context,
+          retryCount: cached.count
+        }, "api.error-handler"), (0, import_node2.json)({
+          success: !1,
+          message: "Too many attempts. Please try again later.",
+          canRetry: !1,
+          retryAfter: Math.ceil((CACHE_TTL - (now - cached.timestamp)) / 1e3)
+        });
+    } else
+      requestCache.set(requestKey, { timestamp: now, count: 1 });
+    let response;
+    switch (errorType) {
+      case "duplicate_request":
+        response = {
+          success: !1,
+          message: "Bu i\u015Flem zaten yap\u0131l\u0131yor. L\xFCtfen bekleyin.",
+          canRetry: !0,
+          retryAfter: 30
+        };
+        break;
+      case "product_creation_failed":
+        response = {
+          success: !1,
+          message: userMessage || "\xDCr\xFCn olu\u015Fturulamad\u0131. L\xFCtfen tekrar deneyin.",
+          canRetry: !0,
+          retryAfter: 60
+        };
+        break;
+      case "cart_addition_failed":
+        response = {
+          success: !1,
+          message: userMessage || "Sepete eklenemedi. L\xFCtfen tekrar deneyin.",
+          canRetry: !0,
+          retryAfter: 30
+        };
+        break;
+      case "validation_error":
+        response = {
+          success: !1,
+          message: userMessage || "Ge\xE7ersiz veri. L\xFCtfen bilgileri kontrol edin.",
+          canRetry: !0,
+          retryAfter: 0
+        };
+        break;
+      default:
+        response = {
+          success: !1,
+          message: "Bilinmeyen hata tipi",
+          canRetry: !1
+        };
+    }
+    return logger2.error(`Error processed: ${errorType}`, {
+      errorType,
+      context,
+      userMessage,
+      canRetry: response.canRetry,
+      retryAfter: response.retryAfter
+    }, "api.error-handler"), (0, import_node2.json)(response);
+  } catch (error) {
+    return logger2.error("Hata i\u015Fleyici hatas\u0131", { error }, "api.error-handler"), (0, import_node2.json)({
+      success: !1,
+      message: "Hata i\u015Flenirken bir sorun olu\u015Ftu",
+      canRetry: !1,
+      error: error instanceof Error ? error.message : "Bilinmeyen hata"
+    }, { status: 500 });
+  }
+};
+setInterval(() => {
+  let now = Date.now();
+  for (let [key, value] of requestCache.entries())
+    now - value.timestamp > CACHE_TTL && requestCache.delete(key);
+}, 10 * 60 * 1e3);
+
+// app/routes/api.add-to-cart.ts
+var api_add_to_cart_exports = {};
+__export(api_add_to_cart_exports, {
+  action: () => action3
+});
+var import_node3 = require("@remix-run/node");
+var action3 = async ({ request: request2 }) => {
+  try {
+    let { admin } = await authenticate.admin(request2);
+    if (request2.method !== "POST")
+      return (0, import_node3.json)({ success: !1, error: "Method not allowed" }, { status: 405 });
+    let body = await request2.json(), { productId, variantId, quantity, width, height, material, price } = body;
+    if (!productId || !variantId || !quantity)
+      return (0, import_node3.json)({
+        success: !1,
+        error: "Product ID, variant ID and quantity are required"
+      }, { status: 400 });
+    await admin.rest.put({
+      path: `products/${productId}`,
+      data: {
+        product: {
+          id: productId,
+          status: "active",
+          // Can be added to cart
+          published_at: null
+          // Not visible in store
+        }
+      }
+    });
+    let cartData = await (await admin.rest.post({
+      path: "carts",
+      data: {
+        cart: {
+          line_items: [{
+            product_id: parseInt(productId),
+            variant_id: parseInt(variantId),
+            quantity,
+            properties: {
+              Width: `${width} cm`,
+              Height: `${height} cm`,
+              Material: material,
+              "Custom Order": "Yes"
+            }
+          }]
+        }
+      }
+    })).json();
+    if (!cartData?.cart)
+      throw new Error("Failed to add to cart");
+    return logger2.info(`Product added to cart: ${productId}, ${width}x${height} ${material}`, {
+      productId,
+      variantId,
+      quantity,
+      width,
+      height,
+      material,
+      price,
+      cartId: cartData.cart.id
+    }, "api.add-to-cart"), (0, import_node3.json)({
+      success: !0,
+      cartId: cartData.cart.id.toString(),
+      message: "\xDCr\xFCn ba\u015Far\u0131yla sepete eklendi"
+    });
+  } catch (error) {
+    return logger2.error("Sepete ekleme hatas\u0131", { error }, "api.add-to-cart"), (0, import_node3.json)({
+      success: !1,
+      error: "\xDCr\xFCn sepete eklenirken bir hata olu\u015Ftu"
+    }, { status: 500 });
+  }
+};
+
+// app/routes/api.scheduler.ts
+var api_scheduler_exports = {};
+__export(api_scheduler_exports, {
+  action: () => action4,
+  loader: () => loader
+});
+var import_node4 = require("@remix-run/node");
+var action4 = async ({ request: request2 }) => {
+  try {
+    let { admin } = await authenticate.admin(request2);
+    if (request2.method !== "POST")
+      return (0, import_node4.json)({ success: !1, error: "Method not allowed" }, { status: 405 });
+    if (request2.headers.get("authorization") !== `Bearer ${process.env.SCHEDULER_API_KEY || "default-key"}`)
+      return (0, import_node4.json)({ success: !1, error: "Unauthorized" }, { status: 401 });
+    let twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1e3), productsData = await (await admin.rest.get({
+      path: "products",
+      query: {
+        limit: "250",
+        status: "active",
+        tag: "temporary"
+      }
+    })).json(), deletedCount = 0, productsToDelete = [];
+    for (let product of productsData.products) {
+      let expiresAtMetafield = product.metafields?.find(
+        (meta2) => meta2.key === "expires_at"
+      );
+      expiresAtMetafield?.value && new Date(expiresAtMetafield.value) < twoHoursAgo && productsToDelete.push(product.id.toString());
+    }
+    for (let productId of productsToDelete)
+      try {
+        await admin.rest.delete({
+          path: `products/${productId}`
+        }), deletedCount++, logger2.info(`Product deleted by scheduler: ${productId}`, { productId }, "api.scheduler");
+      } catch (deleteError) {
+        logger2.error(`Error deleting product: ${productId}`, { productId, error: deleteError }, "api.scheduler");
+      }
+    let nextRun = new Date(Date.now() + 5 * 60 * 1e3);
+    return logger2.info(`Scheduler ran: ${deletedCount} products deleted`, {
+      deletedCount,
+      nextRun: nextRun.toISOString()
+    }, "api.scheduler"), (0, import_node4.json)({
+      success: !0,
+      deletedCount,
+      message: `${deletedCount} ge\xE7ici \xFCr\xFCn otomatik olarak silindi`,
+      nextRun: nextRun.toISOString()
+    });
+  } catch (error) {
+    return logger2.error("Zamanlay\u0131c\u0131 hatas\u0131", { error }, "api.scheduler"), (0, import_node4.json)({
+      success: !1,
+      deletedCount: 0,
+      message: "Zamanlay\u0131c\u0131 s\u0131ras\u0131nda hata olu\u015Ftu",
+      error: error instanceof Error ? error.message : "Bilinmeyen hata"
+    }, { status: 500 });
+  }
+}, loader = async ({ request: request2 }) => {
+  try {
+    let { admin } = await authenticate.admin(request2), temporaryProducts = (await (await admin.rest.get({
+      path: "products",
+      query: {
+        limit: "250",
+        status: "active",
+        tag: "temporary"
+      }
+    })).json()).products.filter((product) => product.metafields?.find(
+      (meta2) => meta2.key === "is_temporary"
+    )?.value === "true"), twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1e3), expiredCount = temporaryProducts.filter((product) => {
+      let expiresAtMetafield = product.metafields?.find(
+        (meta2) => meta2.key === "expires_at"
+      );
+      return expiresAtMetafield?.value ? new Date(expiresAtMetafield.value) < twoHoursAgo : !1;
+    }).length;
+    return (0, import_node4.json)({
+      success: !0,
+      totalTemporaryProducts: temporaryProducts.length,
+      expiredProducts: expiredCount,
+      nextCleanup: new Date(Date.now() + 5 * 60 * 1e3).toISOString()
+    });
+  } catch (error) {
+    return logger2.error("Zamanlay\u0131c\u0131 durum hatas\u0131", { error }, "api.scheduler"), (0, import_node4.json)({
+      success: !1,
+      error: "Zamanlay\u0131c\u0131 durumu al\u0131n\u0131rken hata olu\u015Ftu"
+    }, { status: 500 });
+  }
+};
+
+// app/routes/api.cleanup.ts
+var api_cleanup_exports = {};
+__export(api_cleanup_exports, {
+  action: () => action5,
+  loader: () => loader2
+});
+var import_node5 = require("@remix-run/node");
+var action5 = async ({ request: request2 }) => {
+  try {
+    let { admin } = await authenticate.admin(request2);
+    if (request2.method !== "POST")
+      return (0, import_node5.json)({ success: !1, error: "Method not allowed" }, { status: 405 });
     let twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1e3), productsData = await (await admin.rest.get({
       path: "products",
       query: {
@@ -7830,20 +8075,20 @@ var action2 = async ({ request: request2 }) => {
       } catch (deleteError) {
         logger2.error(`\xDCr\xFCn silinirken hata: ${productId}`, { productId, error: deleteError }, "api.cleanup");
       }
-    return logger2.info(`Temizlik tamamland\u0131: ${deletedCount} \xFCr\xFCn silindi`, { deletedCount }, "api.cleanup"), (0, import_node2.json)({
+    return logger2.info(`Temizlik tamamland\u0131: ${deletedCount} \xFCr\xFCn silindi`, { deletedCount }, "api.cleanup"), (0, import_node5.json)({
       success: !0,
       deletedCount,
       message: `${deletedCount} ge\xE7ici \xFCr\xFCn ba\u015Far\u0131yla silindi`
     });
   } catch (error) {
-    return logger2.error("Temizlik hatas\u0131", { error }, "api.cleanup"), (0, import_node2.json)({
+    return logger2.error("Temizlik hatas\u0131", { error }, "api.cleanup"), (0, import_node5.json)({
       success: !1,
       deletedCount: 0,
       message: "Temizlik s\u0131ras\u0131nda hata olu\u015Ftu",
       error: error instanceof Error ? error.message : "Bilinmeyen hata"
     }, { status: 500 });
   }
-}, loader = async ({ request: request2 }) => {
+}, loader2 = async ({ request: request2 }) => {
   try {
     let { admin } = await authenticate.admin(request2), temporaryProducts = (await (await admin.rest.get({
       path: "products",
@@ -7855,7 +8100,7 @@ var action2 = async ({ request: request2 }) => {
     })).json()).products.filter((product) => product.metafields?.find(
       (meta2) => meta2.key === "is_temporary"
     )?.value === "true");
-    return (0, import_node2.json)({
+    return (0, import_node5.json)({
       success: !0,
       temporaryProductCount: temporaryProducts.length,
       products: temporaryProducts.map((product) => ({
@@ -7866,7 +8111,7 @@ var action2 = async ({ request: request2 }) => {
       }))
     });
   } catch (error) {
-    return logger2.error("\xDCr\xFCn listesi hatas\u0131", { error }, "api.cleanup"), (0, import_node2.json)({
+    return logger2.error("\xDCr\xFCn listesi hatas\u0131", { error }, "api.cleanup"), (0, import_node5.json)({
       success: !1,
       error: "\xDCr\xFCn listesi al\u0131n\u0131rken hata olu\u015Ftu"
     }, { status: 500 });
@@ -7876,9 +8121,9 @@ var action2 = async ({ request: request2 }) => {
 // app/routes/api.pricing.ts
 var api_pricing_exports = {};
 __export(api_pricing_exports, {
-  action: () => action3
+  action: () => action6
 });
-var import_node3 = require("@remix-run/node");
+var import_node6 = require("@remix-run/node");
 var PRICING_DATA = {
   dimensions: {
     "100-200": { min: 0, max: 2e4, coefficient: 1, label: "100-200 cm\xB2" },
@@ -7895,14 +8140,14 @@ var PRICING_DATA = {
     mdf: 40,
     sunta: 25
   }
-}, action3 = async ({ request: request2 }) => {
+}, action6 = async ({ request: request2 }) => {
   try {
     let { admin } = await authenticate.admin(request2);
     if (request2.method !== "POST")
-      return (0, import_node3.json)({ success: !1, error: "Method not allowed" }, { status: 405 });
+      return (0, import_node6.json)({ success: !1, error: "Method not allowed" }, { status: 405 });
     let body = await request2.json(), { width, height, material } = body;
     if (!width || !height || !material)
-      return (0, import_node3.json)({
+      return (0, import_node6.json)({
         success: !1,
         price: 0,
         breakdown: {
@@ -7915,7 +8160,7 @@ var PRICING_DATA = {
         error: "Geni\u015Flik, y\xFCkseklik ve materyal bilgileri gereklidir"
       }, { status: 400 });
     if (width <= 0 || height <= 0 || width > 1e3 || height > 1e3)
-      return (0, import_node3.json)({
+      return (0, import_node6.json)({
         success: !1,
         price: 0,
         breakdown: {
@@ -7951,9 +8196,9 @@ var PRICING_DATA = {
       totalPrice,
       area,
       dimensionRange
-    }, "api.pricing"), (0, import_node3.json)(response);
+    }, "api.pricing"), (0, import_node6.json)(response);
   } catch (error) {
-    return logger2.error("Price calculation error", { error }, "api.pricing"), (0, import_node3.json)({
+    return logger2.error("Price calculation error", { error }, "api.pricing"), (0, import_node6.json)({
       success: !1,
       price: 0,
       breakdown: {
@@ -7972,15 +8217,15 @@ var PRICING_DATA = {
 var app_index_exports = {};
 __export(app_index_exports, {
   default: () => Index,
-  loader: () => loader2
+  loader: () => loader3
 });
-var import_node4 = require("@remix-run/node"), import_react3 = require("@remix-run/react");
-var import_jsx_dev_runtime3 = require("react/jsx-dev-runtime"), loader2 = async ({ request: request2 }) => {
+var import_node7 = require("@remix-run/node"), import_react3 = require("@remix-run/react");
+var import_jsx_dev_runtime3 = require("react/jsx-dev-runtime"), loader3 = async ({ request: request2 }) => {
   let { admin } = await authenticate.admin(request2), shopData = await (await admin.rest.get({ path: "shop" })).json();
   return logger2.info("Ana sayfa ziyaret edildi", {
     shopName: shopData.shop.name,
     timestamp: (/* @__PURE__ */ new Date()).toISOString()
-  }, "app._index"), (0, import_node4.json)({
+  }, "app._index"), (0, import_node7.json)({
     shop: shopData.shop
   });
 };
@@ -8216,6 +8461,38 @@ function Index() {
             columnNumber: 15
           },
           this
+        ),
+        /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(
+          "a",
+          {
+            href: "/api/scheduler",
+            className: "bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors text-center",
+            children: "\u23F0 Zamanlay\u0131c\u0131 Durumu"
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/routes/app._index.tsx",
+            lineNumber: 120,
+            columnNumber: 15
+          },
+          this
+        ),
+        /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(
+          "a",
+          {
+            href: "/api/error-handler",
+            className: "bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 transition-colors text-center",
+            children: "\u{1F6A8} Hata Y\xF6netimi"
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/routes/app._index.tsx",
+            lineNumber: 126,
+            columnNumber: 15
+          },
+          this
         )
       ] }, void 0, !0, {
         fileName: "app/routes/app._index.tsx",
@@ -8230,7 +8507,7 @@ function Index() {
     /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("div", { className: "mt-8 text-center", children: [
       /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("p", { className: "text-gray-600", children: "Herhangi bir sorun ya\u015Farsan\u0131z, l\xFCtfen destek ekibimizle ileti\u015Fime ge\xE7in." }, void 0, !1, {
         fileName: "app/routes/app._index.tsx",
-        lineNumber: 125,
+        lineNumber: 137,
         columnNumber: 13
       }, this),
       /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("p", { className: "text-sm text-gray-500 mt-2", children: [
@@ -8238,12 +8515,12 @@ function Index() {
         (/* @__PURE__ */ new Date()).toLocaleDateString("tr-TR")
       ] }, void 0, !0, {
         fileName: "app/routes/app._index.tsx",
-        lineNumber: 128,
+        lineNumber: 140,
         columnNumber: 13
       }, this)
     ] }, void 0, !0, {
       fileName: "app/routes/app._index.tsx",
-      lineNumber: 124,
+      lineNumber: 136,
       columnNumber: 11
     }, this)
   ] }, void 0, !0, {
@@ -8264,11 +8541,11 @@ function Index() {
 // app/routes/api.logs.ts
 var api_logs_exports = {};
 __export(api_logs_exports, {
-  action: () => action4,
-  loader: () => loader3
+  action: () => action7,
+  loader: () => loader4
 });
-var import_node5 = require("@remix-run/node");
-var loader3 = async ({ request: request2 }) => {
+var import_node8 = require("@remix-run/node");
+var loader4 = async ({ request: request2 }) => {
   try {
     let { admin } = await authenticate.admin(request2), url = new URL(request2.url), level = url.searchParams.get("level"), limit = parseInt(url.searchParams.get("limit") || "100"), source = url.searchParams.get("source"), startDate = url.searchParams.get("startDate"), endDate = url.searchParams.get("endDate"), logs = logger2.getLogs(level, limit);
     if (startDate && endDate) {
@@ -8277,7 +8554,7 @@ var loader3 = async ({ request: request2 }) => {
     }
     source && (logs = logs.filter((log2) => log2.source === source));
     let stats = logger2.getStats();
-    return (0, import_node5.json)({
+    return (0, import_node8.json)({
       success: !0,
       logs: logs.map((log2) => ({
         ...log2,
@@ -8286,21 +8563,21 @@ var loader3 = async ({ request: request2 }) => {
       stats
     });
   } catch (error) {
-    return logger2.error("Log listesi al\u0131n\u0131rken hata olu\u015Ftu", { error }, "api.logs"), (0, import_node5.json)({
+    return logger2.error("Log listesi al\u0131n\u0131rken hata olu\u015Ftu", { error }, "api.logs"), (0, import_node8.json)({
       success: !1,
       error: "Log listesi al\u0131n\u0131rken hata olu\u015Ftu"
     }, { status: 500 });
   }
-}, action4 = async ({ request: request2 }) => {
+}, action7 = async ({ request: request2 }) => {
   try {
     let { admin } = await authenticate.admin(request2);
     if (request2.method !== "POST")
-      return (0, import_node5.json)({ success: !1, error: "Method not allowed" }, { status: 405 });
+      return (0, import_node8.json)({ success: !1, error: "Method not allowed" }, { status: 405 });
     let formData = await request2.formData();
     switch (formData.get("action")) {
       case "clear":
         let level = formData.get("level");
-        return level ? logger2.clearLogsByLevel(level) : logger2.clearLogs(), (0, import_node5.json)({
+        return level ? logger2.clearLogsByLevel(level) : logger2.clearLogs(), (0, import_node8.json)({
           success: !0,
           message: level ? `${level} seviyesindeki loglar temizlendi` : "T\xFCm loglar temizlendi"
         });
@@ -8313,13 +8590,13 @@ var loader3 = async ({ request: request2 }) => {
           }
         });
       default:
-        return (0, import_node5.json)({
+        return (0, import_node8.json)({
           success: !1,
           error: "Ge\xE7ersiz i\u015Flem"
         }, { status: 400 });
     }
   } catch (error) {
-    return logger2.error("Log i\u015Flemi s\u0131ras\u0131nda hata olu\u015Ftu", { error }, "api.logs"), (0, import_node5.json)({
+    return logger2.error("Log i\u015Flemi s\u0131ras\u0131nda hata olu\u015Ftu", { error }, "api.logs"), (0, import_node8.json)({
       success: !1,
       error: "Log i\u015Flemi s\u0131ras\u0131nda hata olu\u015Ftu"
     }, { status: 500 });
@@ -8344,12 +8621,12 @@ function generateCSV(logs) {
 var app_logs_exports = {};
 __export(app_logs_exports, {
   default: () => LogsPage,
-  loader: () => loader4
+  loader: () => loader5
 });
-var import_react4 = require("react"), import_node6 = require("@remix-run/node"), import_react5 = require("@remix-run/react");
-var import_jsx_dev_runtime4 = require("react/jsx-dev-runtime"), loader4 = async ({ request: request2 }) => {
+var import_react4 = require("react"), import_node9 = require("@remix-run/node"), import_react5 = require("@remix-run/react");
+var import_jsx_dev_runtime4 = require("react/jsx-dev-runtime"), loader5 = async ({ request: request2 }) => {
   let { admin } = await authenticate.admin(request2);
-  return (0, import_node6.json)({ logs: [], stats: {} });
+  return (0, import_node9.json)({ logs: [], stats: {} });
 };
 function LogsPage() {
   let [logs, setLogs] = (0, import_react4.useState)([]), [stats, setStats] = (0, import_react4.useState)(null), [loading, setLoading] = (0, import_react4.useState)(!0), [filters, setFilters] = (0, import_react4.useState)({
@@ -9167,7 +9444,7 @@ function Index2() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { entry: { module: "/build/entry.client-KM7MBFTG.js", imports: ["/build/_shared/chunk-O4BRYNJ4.js", "/build/_shared/chunk-XGOTYLZ5.js", "/build/_shared/chunk-Q7GDBZEC.js", "/build/_shared/chunk-LMRCC5LY.js", "/build/_shared/chunk-UWV35TSL.js", "/build/_shared/chunk-U4FRFQSK.js", "/build/_shared/chunk-7M6SC7J5.js", "/build/_shared/chunk-PNG5AS42.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-UYB7YZXE.js", imports: void 0, hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-MCBVVYQ5.js", imports: void 0, hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.cleanup": { id: "routes/api.cleanup", parentId: "root", path: "api/cleanup", index: void 0, caseSensitive: void 0, module: "/build/routes/api.cleanup-7R4LVEWX.js", imports: void 0, hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.create-product": { id: "routes/api.create-product", parentId: "root", path: "api/create-product", index: void 0, caseSensitive: void 0, module: "/build/routes/api.create-product-VYHFLECT.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.logs": { id: "routes/api.logs", parentId: "root", path: "api/logs", index: void 0, caseSensitive: void 0, module: "/build/routes/api.logs-ISQDU7GC.js", imports: void 0, hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.pricing": { id: "routes/api.pricing", parentId: "root", path: "api/pricing", index: void 0, caseSensitive: void 0, module: "/build/routes/api.pricing-RUWRUNEF.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/app._index": { id: "routes/app._index", parentId: "root", path: "app", index: !0, caseSensitive: void 0, module: "/build/routes/app._index-33Y5TWYL.js", imports: ["/build/_shared/chunk-X3IPFAUA.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/app.logs": { id: "routes/app.logs", parentId: "root", path: "app/logs", index: void 0, caseSensitive: void 0, module: "/build/routes/app.logs-RGU6GK7B.js", imports: ["/build/_shared/chunk-X3IPFAUA.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "8da8ff63", hmr: { runtime: "/build/_shared\\chunk-LMRCC5LY.js", timestamp: 1756445917785 }, url: "/build/manifest-8DA8FF63.js" };
+var assets_manifest_default = { entry: { module: "/build/entry.client-K7VOWQGL.js", imports: ["/build/_shared/chunk-O4BRYNJ4.js", "/build/_shared/chunk-4JBIAIGL.js", "/build/_shared/chunk-U4FRFQSK.js", "/build/_shared/chunk-XGOTYLZ5.js", "/build/_shared/chunk-LMRCC5LY.js", "/build/_shared/chunk-UWV35TSL.js", "/build/_shared/chunk-7M6SC7J5.js", "/build/_shared/chunk-PNG5AS42.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-FVWSBEHU.js", imports: void 0, hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-MCBVVYQ5.js", imports: void 0, hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.add-to-cart": { id: "routes/api.add-to-cart", parentId: "root", path: "api/add-to-cart", index: void 0, caseSensitive: void 0, module: "/build/routes/api.add-to-cart-YQJQ33KN.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.cleanup": { id: "routes/api.cleanup", parentId: "root", path: "api/cleanup", index: void 0, caseSensitive: void 0, module: "/build/routes/api.cleanup-7R4LVEWX.js", imports: void 0, hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.create-product": { id: "routes/api.create-product", parentId: "root", path: "api/create-product", index: void 0, caseSensitive: void 0, module: "/build/routes/api.create-product-VYHFLECT.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.error-handler": { id: "routes/api.error-handler", parentId: "root", path: "api/error-handler", index: void 0, caseSensitive: void 0, module: "/build/routes/api.error-handler-BUCP7XAV.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.logs": { id: "routes/api.logs", parentId: "root", path: "api/logs", index: void 0, caseSensitive: void 0, module: "/build/routes/api.logs-ISQDU7GC.js", imports: void 0, hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.pricing": { id: "routes/api.pricing", parentId: "root", path: "api/pricing", index: void 0, caseSensitive: void 0, module: "/build/routes/api.pricing-RUWRUNEF.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.scheduler": { id: "routes/api.scheduler", parentId: "root", path: "api/scheduler", index: void 0, caseSensitive: void 0, module: "/build/routes/api.scheduler-BBLRUUC2.js", imports: void 0, hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/app._index": { id: "routes/app._index", parentId: "root", path: "app", index: !0, caseSensitive: void 0, module: "/build/routes/app._index-QMCHCBK2.js", imports: ["/build/_shared/chunk-X3IPFAUA.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/app.logs": { id: "routes/app.logs", parentId: "root", path: "app/logs", index: void 0, caseSensitive: void 0, module: "/build/routes/app.logs-UKZVER5K.js", imports: ["/build/_shared/chunk-X3IPFAUA.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "f1f25912", hmr: { runtime: "/build/_shared\\chunk-LMRCC5LY.js", timestamp: 1756446808932 }, url: "/build/manifest-F1F25912.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var mode = "development", assetsBuildDirectory = "public\\build", future = { v3_fetcherPersist: !1, v3_relativeSplatPath: !1, v3_throwAbortReason: !1, v3_routeConfig: !1, v3_singleFetch: !1, v3_lazyRouteDiscovery: !1, unstable_optimizeDeps: !1 }, publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
@@ -9186,6 +9463,30 @@ var mode = "development", assetsBuildDirectory = "public\\build", future = { v3_
     index: void 0,
     caseSensitive: void 0,
     module: api_create_product_exports
+  },
+  "routes/api.error-handler": {
+    id: "routes/api.error-handler",
+    parentId: "root",
+    path: "api/error-handler",
+    index: void 0,
+    caseSensitive: void 0,
+    module: api_error_handler_exports
+  },
+  "routes/api.add-to-cart": {
+    id: "routes/api.add-to-cart",
+    parentId: "root",
+    path: "api/add-to-cart",
+    index: void 0,
+    caseSensitive: void 0,
+    module: api_add_to_cart_exports
+  },
+  "routes/api.scheduler": {
+    id: "routes/api.scheduler",
+    parentId: "root",
+    path: "api/scheduler",
+    index: void 0,
+    caseSensitive: void 0,
+    module: api_scheduler_exports
   },
   "routes/api.cleanup": {
     id: "routes/api.cleanup",

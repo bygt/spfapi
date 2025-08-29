@@ -1,337 +1,284 @@
-# Dinamik Fiyat Hesaplayıcı - Shopify App
+# 🖼️ Dynamic Price Calculator - Shopify App
 
-Bu proje, Shopify mağazalarında ürün sayfalarındaki klasik varyant seçiciyi kaldırıp, kullanıcıdan boy, en ve materyal bilgilerini alarak dinamik fiyat hesaplayan ve geçici ürünler oluşturan bir Remix uygulamasıdır.
+A Shopify app that creates custom-sized frames with dynamic pricing based on dimensions and materials. The app automatically creates temporary products, adds them to cart, and cleans them up after 2 hours.
 
-## 🚀 Özellikler
+## ✨ Features
 
-- **Dinamik Fiyat Hesaplama**: Boy, en ve materyal seçimine göre otomatik fiyat hesaplama
-- **Geçici Ürün Oluşturma**: Seçimlere göre otomatik ürün varyantı oluşturma
-- **Otomatik Temizlik**: 2 saat sonra geçici ürünleri otomatik silme
-- **Tema Entegrasyonu**: Shopify temalarına kolay entegrasyon
-- **Responsive Tasarım**: Mobil ve masaüstü uyumlu arayüz
-- **Gerçek Zamanlı Hesaplama**: Anlık fiyat güncellemeleri
+- **Dynamic Pricing**: Calculate prices based on frame dimensions and materials
+- **Temporary Products**: Automatically create and manage temporary products
+- **Cart Integration**: Seamlessly add custom products to Shopify cart
+- **Auto Cleanup**: Automatic removal of expired temporary products
+- **Logging System**: Comprehensive logging and monitoring
+- **Error Handling**: Advanced error management with retry logic
+- **Scheduler**: Automated cleanup system
 
-## 🛠️ Teknolojiler
+## 🚀 Quick Start
 
-- **Frontend**: React, Remix, TypeScript
-- **Styling**: Tailwind CSS
-- **Backend**: Node.js, Remix
-- **Shopify API**: Shopify Admin API, Product API
-- **Database**: In-memory storage (production için veritabanı entegrasyonu mevcut)
+### Prerequisites
 
-## 📋 Gereksinimler
+- Node.js 18+ 
+- npm or yarn
+- Shopify Partner account
+- Shopify store (development or production)
 
-- Node.js 18.0.0 veya üzeri
-- npm veya yarn
-- Shopify Partner hesabı
-- Shopify Development Store
-
-## 🚀 Kurulum
-
-### 1. Projeyi Klonlayın
+### 1. Local Development Setup
 
 ```bash
-git clone <repository-url>
+# Clone the repository
+git clone <your-repo-url>
 cd spfapi
-```
 
-### 2. Bağımlılıkları Yükleyin
-
-```bash
+# Install dependencies
 npm install
-```
 
-### 3. Ortam Değişkenlerini Ayarlayın
-
-```bash
+# Copy environment file
 cp env.example .env
 ```
 
-`.env` dosyasını düzenleyerek Shopify API bilgilerinizi ekleyin:
+### 2. Environment Configuration
+
+Edit `.env` file with your Shopify app credentials:
 
 ```env
+# Shopify App Configuration
 SHOPIFY_API_KEY=your_api_key_here
 SHOPIFY_API_SECRET=your_api_secret_here
-SHOPIFY_APP_URL=https://your-app-domain.com
+SHOPIFY_APP_URL=http://localhost:3000
+SHOPIFY_SCOPES=write_products,write_orders,read_products,read_orders
+
+# Optional: Scheduler API Key (for automated cleanup)
+SCHEDULER_API_KEY=your_scheduler_key_here
+
+# Database (if using external database)
+DATABASE_URL=your_database_url_here
 ```
 
-### 4. Shopify Partner Hesabında Uygulama Oluşturun
+### 3. Shopify App Setup
 
-1. [Shopify Partners](https://partners.shopify.com) hesabınıza giriş yapın
-2. "Apps" > "Create app" seçin
-3. App name: "Dinamik Fiyat Hesaplayıcı"
-4. App URL: Uygulamanızın domain'i
-5. Allowed redirection URLs ekleyin
+#### Step 1: Create Shopify Partner Account
+1. Go to [Shopify Partners](https://partners.shopify.com)
+2. Sign up for a free account
+3. Navigate to "Apps" → "Create app"
 
-### 5. Uygulamayı Çalıştırın
+#### Step 2: Configure App Settings
+1. **App name**: "Dynamic Price Calculator"
+2. **App URL**: `http://localhost:3000`
+3. **Allowed redirection URLs**: 
+   - `http://localhost:3000/auth/callback`
+   - `http://localhost:3000/auth/shopify/callback`
+
+#### Step 3: Configure App Scopes
+Enable these permissions:
+- `write_products` - Create temporary products
+- `write_orders` - Manage cart and orders
+- `read_products` - Read existing products
+- `read_orders` - Read order information
+
+#### Step 4: Install App on Store
+1. Go to "Test your app"
+2. Select your development store
+3. Install the app
+4. Copy the API credentials to your `.env` file
+
+### 4. Run the Application
 
 ```bash
+# Start development server
 npm run dev
+
+# The app will be available at: http://localhost:3000
 ```
 
-## 🔧 Konfigürasyon
+### 5. Theme Integration
 
-### Shopify App Ayarları
+#### Step 1: Access Theme Editor
+1. In your Shopify admin, go to **Online Store** → **Themes**
+2. Click **Customize** on your active theme
 
-`shopify.app.toml` dosyasını düzenleyin:
+#### Step 2: Add App Block
+1. Navigate to a product template
+2. Click **Add section** → **Apps**
+3. Select "Dynamic Price Calculator"
+4. Configure the app block settings
 
-```toml
-name = "Dinamik Fiyat Hesaplayıcı"
-client_id = "your_client_id_here"
-application_url = "https://your-app-domain.com"
-embedded = true
+#### Step 3: Hide Default Variant Selector
+1. In the theme editor, find the product variant selector
+2. Click on it and select **Hide**
+3. This prevents conflicts with the custom app interface
 
-[access_scopes]
-scopes = "read_products,write_products,read_themes,write_themes,read_orders,write_orders"
+### 6. Testing the App
+
+#### Test Product Creation
+1. Go to any product page with the app block
+2. Enter dimensions (width × height)
+3. Select material
+4. Click "Calculate Price"
+5. Verify the price calculation
+
+#### Test Cart Integration
+1. After price calculation, click "Add to Cart"
+2. Check if the temporary product appears in cart
+3. Verify custom properties (dimensions, material)
+
+#### Test Auto Cleanup
+1. Create a temporary product
+2. Wait for 2 hours (or manually trigger cleanup)
+3. Check if the product is automatically removed
+
+## 🛠️ API Endpoints
+
+### Core APIs
+- `POST /api/create-product` - Create temporary product
+- `POST /api/add-to-cart` - Add product to cart
+- `GET /api/pricing` - Calculate product price
+- `GET /api/cleanup` - Manual cleanup trigger
+
+### Management APIs
+- `GET /app/logs` - View system logs
+- `GET /api/scheduler` - Check scheduler status
+- `POST /api/scheduler` - Trigger cleanup (with API key)
+- `POST /api/error-handler` - Handle errors
+
+## 📁 Project Structure
+
+```
+spfapi/
+├── app/
+│   ├── routes/
+│   │   ├── api.create-product.ts    # Product creation
+│   │   ├── api.add-to-cart.ts       # Cart integration
+│   │   ├── api.pricing.ts           # Price calculation
+│   │   ├── api.cleanup.ts           # Manual cleanup
+│   │   ├── api.scheduler.ts         # Auto cleanup
+│   │   ├── api.error-handler.ts     # Error management
+│   │   ├── app._index.tsx           # Main dashboard
+│   │   └── app.logs.tsx             # Log viewer
+│   ├── utils/
+│   │   └── logger.ts                # Logging system
+│   └── shopify.server.ts            # Shopify configuration
+├── public/                           # Static assets
+├── .env.example                     # Environment template
+├── package.json                     # Dependencies
+└── README.md                        # This file
 ```
 
-### Fiyat Hesaplama Katsayıları
+## 🔧 Configuration Options
 
-`app/routes/api.pricing.ts` dosyasında fiyat hesaplama mantığını özelleştirebilirsiniz:
+### Pricing Configuration
+Edit `app/routes/api.pricing.ts` to modify:
+- Base prices for different materials
+- Price multipliers for dimensions
+- Additional cost factors
 
-```typescript
-const PRICING_DATA = {
-  dimensions: {
-    "100-200": { min: 0, max: 20000, coefficient: 1.0, label: "100-200 cm²" },
-    "201-400": { min: 20001, max: 80000, coefficient: 1.5, label: "201-400 cm²" },
-    // ... diğer boyut aralıkları
-  },
-  materials: {
-    "ahşap": 50,
-    "cam": 80,
-    "metal": 120,
-    // ... diğer materyaller
-  },
-};
-```
+### Cleanup Settings
+Edit `app/routes/api.scheduler.ts` to adjust:
+- Cleanup frequency (default: 5 minutes)
+- Product expiration time (default: 2 hours)
+- Maximum products per cleanup batch
 
-## 🎨 Tema Entegrasyonu
+### Logging Configuration
+Edit `app/utils/logger.ts` to customize:
+- Log retention period
+- Log file size limits
+- Error notification settings
 
-### 1. App Block Ekleme
+## 🚨 Troubleshooting
 
-1. Shopify Admin > Online Store > Themes
-2. "Customize" butonuna tıklayın
-3. Product template'i seçin
-4. "Add block" > "Apps" > "Dinamik Fiyat Hesaplayıcı"
-5. Bloğu istediğiniz konuma sürükleyin
+### Common Issues
 
-### 2. Mevcut Varyant Seçiciyi Gizleme
+#### 1. App Not Loading
+- Check if `.env` file exists and has correct credentials
+- Verify Shopify app is installed on the store
+- Check browser console for JavaScript errors
 
-CSS ile mevcut varyant seçiciyi gizleyin:
+#### 2. Products Not Creating
+- Verify app has `write_products` permission
+- Check if product tags are properly set
+- Review server logs for API errors
 
-```css
-.product-form__variants,
-.product-form__input,
-.product-form__buttons {
-  display: none !important;
-}
-```
+#### 3. Cart Integration Failing
+- Ensure app has `write_orders` permission
+- Check if temporary products are set to `active` status
+- Verify cart API endpoints are accessible
 
-### 3. App Block Özelleştirme
+#### 4. Auto Cleanup Not Working
+- Check scheduler API key configuration
+- Verify cron job setup (if using external scheduler)
+- Review scheduler logs for errors
 
-`app/blocks/product-form.liquid` dosyasını düzenleyerek görünümü özelleştirebilirsiniz.
-
-## 📊 API Endpoints
-
-### Fiyat Hesaplama
-
-```http
-POST /api/pricing
-Content-Type: application/json
-
-{
-  "width": 400,
-  "height": 500,
-  "material": "ahşap"
-}
-```
-
-### Ürün Oluşturma
-
-```http
-POST /api/create-product
-Content-Type: application/json
-
-{
-  "width": 400,
-  "height": 500,
-  "material": "ahşap",
-  "price": 150
-}
-```
-
-### Temizlik
-
-```http
-POST /api/cleanup
-```
-
-## 🔄 Otomatik Temizlik Sistemi
-
-Uygulama, 2 saat sonra geçici ürünleri otomatik olarak siler:
-
-- **Zamanlayıcı**: Her 5 dakikada bir çalışır
-- **Filtreleme**: `geçici` etiketi ve `expires_at` metafield'ına göre
-- **Güvenlik**: Siparişe girmiş ürünler de silinir (sipariş kaydı korunur)
-
-## 📱 Kullanım
-
-### 1. Ürün Sayfasında
-
-1. Kullanıcı boy, en ve materyal seçer
-2. Fiyat otomatik hesaplanır
-3. "Sepete Ekle" butonuna tıklar
-4. Geçici ürün oluşturulur ve sepete eklenir
-
-### 2. Admin Paneli
-
-- Uygulama ana sayfası: `/app`
-- Geçici ürün listesi: `/api/cleanup` (GET)
-- Manuel temizlik: `/api/cleanup` (POST)
-
-## 🚨 Hata Yönetimi
-
-- **Validasyon**: Boyut ve materyal kontrolü
-- **API Hataları**: Shopify API hatalarını yakalama
-- **Kullanıcı Geri Bildirimi**: Net hata mesajları
-- **Loglama**: Detaylı log kayıtları
-
-## 🔒 Güvenlik
-
-- **Shopify Authentication**: OAuth 2.0 ile güvenli erişim
-- **API Key Protection**: Environment variables ile koruma
-- **Input Validation**: Kullanıcı girdisi validasyonu
-- **Rate Limiting**: API çağrı limitleri
-
-## 📈 Performans
-
-- **Lazy Loading**: Gereksiz veri yüklemeyi önleme
-- **Caching**: Fiyat hesaplama sonuçlarını önbellekleme
-- **Optimized Queries**: Shopify API çağrılarını optimize etme
-- **Background Processing**: Temizlik işlemlerini arka planda yapma
-
-## 🧪 Test
-
-### Manuel Test
-
-1. Uygulamayı development store'a kurun
-2. Ürün sayfasında form'u test edin
-3. Farklı boyut ve materyal kombinasyonları deneyin
-4. Sepete ekleme işlemini test edin
-5. 2 saat sonra otomatik silme işlemini kontrol edin
-
-### API Test
-
-```bash
-# Fiyat hesaplama testi
-curl -X POST http://localhost:3000/api/pricing \
-  -H "Content-Type: application/json" \
-  -d '{"width": 400, "height": 500, "material": "ahşap"}'
-
-# Temizlik testi
-curl -X POST http://localhost:3000/api/cleanup
-```
-
-## 📊 Log Sistemi
-
-### Log Özellikleri
-- **Log Seviyeleri**: INFO, WARNING, ERROR, DEBUG
-- **Kaynak Takibi**: Her log kaydında hangi API endpoint'ten geldiği belirtilir
-- **Context Bilgisi**: Detaylı bilgiler JSON formatında saklanır
-- **Otomatik Temizlik**: Maksimum 1000 log kaydı tutulur
-- **Hata Alarmı**: Son 1 saatte 10+ hata olursa otomatik uyarı
-
-### Log Görüntüleme
-- **Admin Paneli**: `/app/logs` sayfasından logları görüntüleyin
-- **Filtreleme**: Log seviyesi, kaynak, tarih aralığı ve limit ile filtreleme
-- **İstatistikler**: Toplam, son 1 saat, son 24 saat ve seviye bazında sayılar
-- **Export**: CSV formatında log indirme
-- **Temizlik**: Belirli seviyedeki veya tüm logları temizleme
-
-### API Endpoint'leri
-- **GET /api/logs**: Log listesi ve istatistikler
-- **POST /api/logs**: Log temizleme ve export işlemleri
-
-## 🚀 Production Deployment
-
-### 1. Hosting
-
-- **Vercel**: Remix uygulamaları için önerilen
-- **Netlify**: Kolay deployment
-- **AWS/GCP**: Özel sunucu çözümleri
-
-### 2. Environment Variables
-
-Production ortamında gerekli değişkenleri ayarlayın:
-
+### Debug Mode
+Enable debug logging by setting:
 ```env
-NODE_ENV=production
-SHOPIFY_API_KEY=your_production_api_key
-SHOPIFY_API_SECRET=your_production_api_secret
-SHOPIFY_APP_URL=https://your-production-domain.com
+DEBUG=true
+LOG_LEVEL=DEBUG
 ```
 
-### 3. Database
+## 📊 Monitoring & Maintenance
 
-Production için veritabanı entegrasyonu:
+### Log Management
+- Access logs at `/app/logs`
+- Export logs for analysis
+- Set up log rotation
 
-```typescript
-// PostgreSQL, MySQL veya MongoDB entegrasyonu
-import { Pool } from 'pg';
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
-```
+### Performance Monitoring
+- Monitor API response times
+- Track temporary product creation rates
+- Monitor cleanup job performance
 
-## 📝 Log ve İzleme
+### Regular Maintenance
+- Review and clean old log files
+- Monitor disk space usage
+- Update dependencies regularly
 
-### Log Seviyeleri
+## 🔒 Security Considerations
 
-- **INFO**: Normal işlemler
-- **WARN**: Uyarılar
-- **ERROR**: Hatalar
-- **DEBUG**: Geliştirme bilgileri
+- **API Keys**: Never commit `.env` files to version control
+- **Permissions**: Use minimal required Shopify app scopes
+- **Rate Limiting**: Implement rate limiting for public APIs
+- **Input Validation**: Validate all user inputs
+- **HTTPS**: Always use HTTPS in production
 
-### Metrikler
+## 🚀 Deployment
 
-- Geçici ürün oluşturma sayısı
-- Silinen ürün sayısı
-- API response time
-- Hata oranları
+### Production Environment
+1. Set up production server (Vercel, Netlify, or custom)
+2. Update `SHOPIFY_APP_URL` to production URL
+3. Configure production environment variables
+4. Set up SSL certificates
+5. Configure domain and DNS
 
-## 🤝 Katkıda Bulunma
+### CI/CD Pipeline
+1. Set up automated testing
+2. Configure deployment triggers
+3. Set up environment-specific configurations
+4. Implement rollback procedures
 
-1. Fork yapın
-2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
-3. Commit yapın (`git commit -m 'Add amazing feature'`)
-4. Push yapın (`git push origin feature/amazing-feature`)
-5. Pull Request oluşturun
+## 📚 Additional Resources
 
-## 📄 Lisans
+- [Shopify App Development](https://shopify.dev/apps)
+- [Remix Framework Documentation](https://remix.run/docs)
+- [Shopify Admin API](https://shopify.dev/api/admin)
+- [Shopify Theme Development](https://shopify.dev/themes)
 
-Bu proje MIT lisansı altında lisanslanmıştır.
+## 🤝 Contributing
 
-## 🆘 Destek
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
-- **Dokümantasyon**: Bu README dosyası
-- **Issues**: GitHub Issues
-- **Shopify Docs**: [Shopify App Development](https://shopify.dev/apps)
+## 📄 License
 
-## 🔄 Güncellemeler
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-### v1.0.0
-- İlk sürüm
-- Temel dinamik fiyat hesaplama
-- Geçici ürün oluşturma
-- Otomatik temizlik sistemi
+## 🆘 Support
 
-### Gelecek Özellikler
-- Çoklu dil desteği
-- Gelişmiş fiyat algoritmaları
-- Bulk ürün oluşturma
-- Analytics dashboard
-- Email bildirimleri
+For support and questions:
+- Create an issue in the repository
+- Contact the development team
+- Check the troubleshooting section above
 
 ---
 
-**Not**: Bu uygulama Shopify Partner programı kapsamında geliştirilmiştir. Kullanım öncesi Shopify'ın güncel API dokümantasyonunu kontrol ediniz.
+**Happy coding! 🎉**
