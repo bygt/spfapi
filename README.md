@@ -182,37 +182,6 @@ Edit `app/utils/logger.ts` to customize:
 - Log file size limits
 - Error notification settings
 
-## 🚨 Troubleshooting
-
-### Common Issues
-
-#### 1. App Not Loading
-- Check if `.env` file exists and has correct credentials
-- Verify Shopify app is installed on the store
-- Check browser console for JavaScript errors
-
-#### 2. Products Not Creating
-- Verify app has `write_products` permission
-- Check if product tags are properly set
-- Review server logs for API errors
-
-#### 3. Cart Integration Failing
-- Ensure app has `write_orders` permission
-- Check if temporary products are set to `active` status
-- Verify cart API endpoints are accessible
-
-#### 4. Auto Cleanup Not Working
-- Check scheduler API key configuration
-- Verify cron job setup (if using external scheduler)
-- Review scheduler logs for errors
-
-### Debug Mode
-Enable debug logging by setting:
-```env
-DEBUG=true
-LOG_LEVEL=DEBUG
-```
-
 ## 📊 Monitoring & Maintenance
 
 ### Log Management
@@ -229,15 +198,7 @@ LOG_LEVEL=DEBUG
 - Review and clean old log files
 - Monitor disk space usage
 - Update dependencies regularly
-
-## 🔒 Security Considerations
-
-- **API Keys**: Never commit `.env` files to version control
-- **Permissions**: Use minimal required Shopify app scopes
-- **Rate Limiting**: Implement rate limiting for public APIs
-- **Input Validation**: Validate all user inputs
-- **HTTPS**: Always use HTTPS in production
-
+  
 ## 🚀 Deployment
 
 ### Production Environment
@@ -268,16 +229,10 @@ LOG_LEVEL=DEBUG
 4. Add tests if applicable
 5. Submit a pull request
 
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
 ## 🆘 Support
 
 For support and questions:
 - Create an issue in the repository
-- Contact the development team
-- Check the troubleshooting section above
 
 ---
 
