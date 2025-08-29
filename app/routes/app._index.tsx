@@ -1,15 +1,24 @@
+import React from "react";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { authenticate } from "../shopify.server";
+import { logger } from "../utils/logger";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { admin } = await authenticate.admin(request);
 
   // Mağaza bilgilerini al
-  const shop = await admin.shop.get();
+  const shop = await admin.rest.get({ path: "shop" });
+  
+  // Test log kaydı eklee
+  const shopData = await shop.json();
+  logger.info("Ana sayfa ziyaret edildi", { 
+    shopName: shopData.shop.name,
+    timestamp: new Date().toISOString()
+  }, "app._index");
   
   return json({
-    shop: shop.data.shop,
+    shop: shopData.shop,
   });
 };
 
@@ -87,6 +96,27 @@ export default function Index() {
                 </div>
                 <p className="text-yellow-800">Test edin ve kullanın</p>
               </div>
+            </div>
+          </div>
+
+          {/* Yönetim Araçları */}
+          <div className="mt-8 bg-purple-50 p-6 rounded-lg">
+            <h3 className="text-xl font-semibold text-purple-900 mb-4">
+              🛠️ Yönetim Araçları
+            </h3>
+            <div className="grid md:grid-cols-2 gap-4">
+              <a
+                href="/app/logs"
+                className="bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors text-center"
+              >
+                📊 Sistem Logları
+              </a>
+              <a
+                href="/api/cleanup"
+                className="bg-orange-600 text-white px-4 py-3 rounded-lg hover:bg-orange-700 transition-colors text-center"
+              >
+                🧹 Manuel Temizlik
+              </a>
             </div>
           </div>
 

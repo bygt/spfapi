@@ -1,5 +1,6 @@
 import { json, type ActionFunctionArgs } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
+import { logger } from "../utils/logger";
 
 interface PricingRequest {
   width: number;
@@ -21,7 +22,6 @@ interface PricingResponse {
   error?: string;
 }
 
-// Fiyat hesaplama katsayıları
 const PRICING_DATA = {
   dimensions: {
     "100-200": { min: 0, max: 20000, coefficient: 1.0, label: "100-200 cm²" },
@@ -51,7 +51,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const body: PricingRequest = await request.json();
     const { width, height, material } = body;
 
-    // Validasyon
+    // Validation
     if (!width || !height || !material) {
       return json<PricingResponse>({
         success: false,
@@ -68,7 +68,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     }
 
     if (width <= 0 || height <= 0 || width > 1000 || height > 1000) {
-      return json<PricingResponse>({
+      return json<PricingResponse>({    
         success: false,
         price: 0,
         breakdown: {
@@ -82,12 +82,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       }, { status: 400 });
     }
 
-    // Fiyat hesaplama
+    // Price calculation
     const area = width * height;
     const basePrice = 25; // Temel fiyat
     
-    // Materyal fiyatı
-    const materialPrice = PRICING_DATA.materials[material.toLowerCase()] || 0;
+    // Material price
+    const materialPrice = PRICING_DATA.materials[material.toLowerCase() as keyof typeof PRICING_DATA.materials] || 0;
     
     // Boyut katsayısı
     let dimensionCoefficient = 1.0;
@@ -101,7 +101,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       }
     }
 
-    // Toplam fiyat hesaplama
+    // Total price calculation
     const totalPrice = Math.round((basePrice + materialPrice) * dimensionCoefficient);
 
     const response: PricingResponse = {
@@ -116,13 +116,20 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       },
     };
 
-    // Log kaydı
-    console.log(`Fiyat hesaplandı: ${width}x${height} ${material} = ${totalPrice}TL`);
+    // Log record
+    logger.info(`Fiyat hesaplandı: ${width}x${height} ${material} = ${totalPrice}TL`, {
+      width,
+      height,
+      material,
+      totalPrice,
+      area,
+      dimensionRange
+    }, "api.pricing");
 
     return json(response);
 
   } catch (error) {
-    console.error("Fiyat hesaplama hatası:", error);
+    logger.error("Price calculation error", { error }, "api.pricing");
     
     return json<PricingResponse>({
       success: false,
@@ -134,7 +141,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         area: 0,
         dimensionRange: "",
       },
-      error: "Fiyat hesaplanırken bir hata oluştu",
+      error: "An error occurred while calculating the price",
     }, { status: 500 });
   }
 };

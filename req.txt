@@ -1,0 +1,142 @@
+Amaç: Ürün sayfasındaki klasik varyant seçiciyi kaldırıp; kullanıcıdan boy, en ve materyal
+bilgilerini alarak dinamik fiyat hesaplamak, bu seçimleri sepete “geçici ürün” olarak eklemek ve 2
+saat sonra otomatik silmek.
+Kullanman gereken teknolojiler: React / Remix
+
+1) Başlangıç & Ortam Hazırlığı
+Task 1 — Partner hesabı ve test mağazası aç
+● Ne yapacaksın? Shopify Partner paneline hesap aç, içinde “Development store” (test
+mağazası) oluştur.
+● Neyi kontrol etmelisin? Mağaza açık, online tema yüklü (Dawn vb.), vitrin görülebiliyor.
+● Bitti sayılması için: Test mağazasında ana sayfaya ve örnek bir ürün sayfasına
+girebiliyorsun.
+
+Task 2 — Uygulama iskeleti (Remix) kur
+● Ne yapacaksın? Shopify’ın önerdiği “Remix app” şablonuyla bir uygulama başlat, test
+mağazasına bağla ve uygulamayı mağazaya kur.
+● Neyi kontrol etmelisin? Uygulama mağazanın “Apps” bölümünde görünüyor; giriş
+yaptığında hata vermiyor.
+● Bitti sayılması için: Uygulama kurulu ve açılıyor.
+
+Task 3 — İzinler (yetkiler) ayarla
+● Ne yapacaksın? Uygulamanın ürünleri okuma/yazma ve temaları okuma iznine sahip
+olduğundan emin ol.
+● Neyi kontrol etmelisin? Uygulamayı tekrar kurduğunda yetki ekranında bu izinler
+görünüyor.
+● Bitti sayılması için: Uygulama ürün verilerine erişebiliyor (ör. ürün listesi çekilebiliyor –
+teknik ekip doğrular).
+
+2) Tema ile Entegrasyon (Ekrana kendi formunu getir)
+Task 4 — Tema içine uygulama bloğu ekle
+● Ne yapacaksın? Ürün sayfasına eklenebilen bir “uygulama bloğu” (app block) oluşturup
+temaya ekle.
+● Neyi kontrol etmelisin? Ürün sayfasına girdiğinde bizim bileşenimiz görünüyor.
+● Bitti sayılması için: Tema düzenleyicisinde (Theme Editor) ürün şablonuna blok
+eklenebiliyor ve sayfada beliriyor.
+
+Task 5 — Mevcut varyant seçiciyi gizle
+● Ne yapacaksın? Temadaki default varyant alanlarını görünmez yap.
+● Neyi kontrol etmelisin? Ürün sayfasında artık tema’nın kendi “beden/renk” alanları
+görünmüyor.
+● Bitti sayılması için: Kullanıcı sadece Boy, En, Materyal alanlarını ve bizim “Sepete
+Ekle” butonumuzu görüyor.
+
+Task 6 — Kendi formun: Boy, En, Materyal
+● Ne yapacaksın? Üç alanı (boy, en, materyal) kullanıcıdan toplayan basit bir form göster.
+● Neyi kontrol etmelisin? Form alanları doldurulmadan sepete ekleme yapılmasın,
+hataları net mesajla göster.
+● Bitti sayılması için: Form etkileşimleri sorunsuz; mobil ve masaüstünde düzgün
+görünüyor.
+
+3) Fiyat Mantığı (katsayı tablosuna göre)
+Task 7 — Fiyatlama kurallarını belirle
+
+● Ne yapacaksın? “Boy × En → katsayı” ve “Materyal → materyal fiyatı” mantığını bir
+tablo olarak tanımla (JSON vb. – bu dokümana eklemiyoruz).
+● Neyi kontrol etmelisin? Her (boy, en) aralığı için tek ve net bir katsayı çıkıyor; her
+materyalin bir fiyatı var.
+● Bitti sayılması için: Örnek bir değerle (ör. 400×500, “Ahşap”) test ettiğinde beklenen
+katsayı ve materyal bedeli bulunuyor.
+
+Task 8 — Canlı fiyat gösterimi
+● Ne yapacaksın? Kullanıcı formda değer değiştirince ekranda “Tahmini Fiyat” anında
+güncellensin.
+● Neyi kontrol etmelisin? Form boş veya hatalıysa fiyat gösterimi kaybolur ya da uyarı
+verir.
+● Bitti sayılması için: Kullanıcı seçim yaptıkça fiyat gecikmeden güncelleniyor.
+
+4) Sepete Ekleme (geçici varyant yaklaşımı)
+Task 9 — Geçici ürün oluştur
+● Ne yapacaksın? Kullanıcı “Sepete Ekle” dediğinde; seçilen boy-en-materyale göre fiyatı
+hesapla ve ilgili üründe geçici bir varyant oluştur.
+● Neyi kontrol etmelisin? Ürün adı seçimi yansıtıyor (ör. “Çerçeve 400×500 – Ahşap”),
+fiyat doğru.
+● Bitti sayılması için: Geçici ürün mağazada oluşuyor ve web vitrininde (gizli de olabilir)
+sepete eklenebilir durumda.
+
+Task 10 — Sepete ekle & kullanıcı bilgilerini iliştir
+● Ne yapacaksın? Oluşan geçici ürünün tek varyantını sepete ekle; satır notlarına (line
+item notları) boy, en, materyal değerlerini iliştir.
+● Neyi kontrol etmelisin? Sepette görünen fiyat hesaplanan fiyata eşit; notlarda kullanıcı
+seçimi okunuyor.
+
+● Bitti sayılması için: Sepete yönlendirildiğinde satırda doğru fiyat ve değerler var.
+
+5) Otomatik Temizlik (2 saat sonra sil)
+Task 11 — Silme zamanını kaydet
+● Ne yapacaksın? Her oluşturulan geçici ürün için “oluşturulma zamanı + 2 saat” şeklinde
+bir silme zamanı kaydı tut.
+● Neyi kontrol etmelisin? Bir liste ya da küçük bir veritabanında bu kayıtlar saklanıyor.
+● Bitti sayılması için: Geçici ürünlerin her birinin planlı silinme saati izlenebilir.
+
+Task 12 — Zamanlayıcı / görev çalıştırıcı ayarla
+● Ne yapacaksın? Her birkaç dakikada bir çalışan ufak bir görev, “silinmesi gereken”
+ürünleri bulup silsin.
+● Neyi kontrol etmelisin? Elektrik kesilse/uygulama yeniden başlasa bile sistem silinmesi
+gerekenleri kaçırmıyor.
+● Bitti sayılması için: 2 saati dolmuş geçici ürünler otomatik siliniyor; log kayıtlarında
+görülebiliyor.
+
+Task 13 — Ek güvenlik: siparişe giren geçici ürünler
+● Ne yapacaksın? Eğer geçici ürün üzerinden sipariş verilmişse, yarattığın varyantı yine
+de mağazadan silebilirsin (sipariş kaydı etkilenmez).
+● Neyi kontrol etmelisin? Silme işlemi geçmiş sipariş ekranlarını bozmuyor.
+● Bitti sayılması için: Siparişe girmiş bile olsa 2 saat sonrası temizlik tamamlanıyor.
+
+6) Görünürlük ve içerik hijyeni
+Task 14 — Geçici ürünlerin vitrine karışmaması (bonus)
+
+● Ne yapacaksın? Geçici ürünler listelemelere ve aramaya çıkmasın (etiket, gizli şablon,
+“noindex” meta, koleksiyon kuralları).
+● Neyi kontrol etmelisin? Mağaza aramasında, koleksiyonlarda ve sitemap’te
+görünmüyor.
+● Bitti sayılması için: Kullanıcı vitrininde bu ürünlere rastlamıyor; sadece sepet akışında
+kullanılıyor.
+
+7) Hata Yönetimi ve Dayanıklılık
+
+Task 15 — Geri dönüş mesajları
+● Ne yapacaksın? Ürün oluşturma gecikirse veya başarısız olursa kullanıcıya anlaşılır
+uyarılar göster.
+● Neyi kontrol etmelisin? Kullanıcı “tekrar dene” veya “iptal et” gibi seçenekler
+görebiliyor.
+● Bitti sayılması için: Başarısız senaryolarda ekran kararmıyor, net mesaj çıkıyor.
+
+Task 16 — Yük altında davranış
+● Ne yapacaksın? Peş peşe gelen taleplerde aynı seçime ikinci kez ürün oluşturmamaya
+çalış (yinelenen oluşturma engeli).
+● Neyi kontrol etmelisin? Aynı seçim için kısa sürede iki geçici ürün açılmıyor.
+● Bitti sayılması için: “Çifte ürün” vakaları loglarda gözükmüyor.
+
+8) Operasyon & İzleme
+
+Task 17 — Günlük temizlik taraması
+
+● Ne yapacaksın? Olur da zamanlayıcı kaçırırsa, günde 1 kez “etiketi” olan tüm geçici
+ürünleri tarayıp kalanları sil.
+● Bitti sayılması için: 24 saat sonunda mağazada geçici ürün kalmıyor.
+
+Task 18 — Log ve alarm
+● Ne yapacaksın? “Ürün oluşturuldu / sepete eklendi / silindi / hata” gibi olayları kaydet;
+hata sayısı artarsa uyarı ver.
+● Bitti sayılması için: Basit bir günlük (log) listesinde her adım izlenebiliyor.

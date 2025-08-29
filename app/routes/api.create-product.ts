@@ -1,5 +1,6 @@
 import { json, type ActionFunctionArgs } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
+import { logger } from "../utils/logger";
 
 interface CreateProductRequest {
   width: number;
@@ -29,7 +30,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const body: CreateProductRequest = await request.json();
     const { width, height, material, price, baseProductId, customerEmail } = body;
 
-    // Validasyon
+    // Validation
     if (!width || !height || !material || !price) {
       return json<CreateProductResponse>({
         success: false,
@@ -37,87 +38,101 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       }, { status: 400 });
     }
 
-    // Geçici ürün adı oluştur
+    // Temporary product name
     const productTitle = `Çerçeve ${width}×${height} - ${material.charAt(0).toUpperCase() + material.slice(1)}`;
     
-    // Geçici ürün oluştur
-    const product = await admin.product.create({
-      title: productTitle,
-      body_html: `<p>Özel boyutlu çerçeve: ${width}×${height} cm, ${material} materyal</p>`,
-      vendor: "Özel Sipariş",
-      product_type: "Çerçeve",
-      tags: ["geçici", "özel-boyut", "dinamik-fiyat"],
-      status: "draft", // Vitrinde görünmesin
-      variants: [
-        {
-          price: price.toString(),
-          inventory_quantity: 1,
-          inventory_management: "shopify",
-          option1: `${width}×${height}`,
-          option2: material,
-          option3: "Özel Boyut",
-        },
-      ],
-      options: [
-        { name: "Boyut" },
-        { name: "Materyal" },
-        { name: "Tip" },
-      ],
-      metafields: [
-        {
-          namespace: "custom",
-          key: "width",
-          value: width.toString(),
-          type: "number_integer",
-        },
-        {
-          namespace: "custom",
-          key: "height",
-          value: height.toString(),
-          type: "number_integer",
-        },
-        {
-          namespace: "custom",
-          key: "material",
-          value: material,
-          type: "single_line_text_field",
-        },
-        {
-          namespace: "custom",
-          key: "is_temporary",
-          value: "true",
-          type: "boolean",
-        },
-        {
-          namespace: "custom",
-          key: "created_at",
-          value: new Date().toISOString(),
-          type: "date_time",
-        },
-        {
-          namespace: "custom",
-          key: "expires_at",
-          value: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2 saat sonra
-          type: "date_time",
-        },
-        {
-          namespace: "custom",
-          key: "customer_email",
-          value: customerEmail || "",
-          type: "single_line_text_field",
-        },
-      ],
+    // Create temporary product
+    const product = await admin.rest.post({
+      path: "products",
+      data: {
+        product: {
+          title: productTitle,
+          body_html: `<p>Özel boyutlu çerçeve: ${width}×${height} cm, ${material} materyal</p>`,
+          vendor: "Özel Sipariş",
+          product_type: "Çerçeve",
+          tags: ["geçici", "özel-boyut", "dinamik-fiyat"],
+          status: "draft", // Not visible in the store
+          variants: [
+            {
+              price: price.toString(),
+              inventory_quantity: 1,
+              inventory_management: "shopify",
+              option1: `${width}×${height}`,
+              option2: material,
+              option3: "Özel Boyut",
+            },
+          ],
+          options: [
+            { name: "Boyut" },
+            { name: "Materyal" },
+            { name: "Tip" },
+          ],
+          metafields: [
+            {
+              namespace: "custom",
+              key: "width",
+              value: width.toString(),
+              type: "number_integer",
+            },
+            {
+              namespace: "custom",
+              key: "height",
+              value: height.toString(),
+              type: "number_integer",
+            },
+            {
+              namespace: "custom",
+              key: "material",
+              value: material,
+              type: "single_line_text_field",
+            },
+            {
+              namespace: "custom",
+              key: "is_temporary",
+              value: "true",
+              type: "boolean",
+            },
+            {
+              namespace: "custom",
+              key: "created_at",
+              value: new Date().toISOString(),
+              type: "date_time",
+            },
+            {
+              namespace: "custom",
+              key: "expires_at",
+              value: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2 saat sonra
+              type: "date_time",
+            },
+            {
+              namespace: "custom",
+              key: "customer_email",
+              value: customerEmail || "",
+              type: "single_line_text_field",
+            },
+          ],
+        }
+      }
     });
 
-    if (!product.data?.product) {
+    const productData = await product.json();
+    if (!productData?.product) {
       throw new Error("Ürün oluşturulamadı");
     }
 
-    const createdProduct = product.data.product;
+    const createdProduct = productData.product;
     const variantId = createdProduct.variants?.[0]?.id;
 
     // Log kaydı
-    console.log(`Geçici ürün oluşturuldu: ${createdProduct.id}, ${productTitle}, ${price}TL`);
+    logger.info(`Geçici ürün oluşturuldu: ${createdProduct.id}, ${productTitle}, ${price}TL`, {
+      productId: createdProduct.id,
+      productTitle,
+      price,
+      width,
+      height,
+      material,
+      customerEmail
+    }, "api.create-product");
 
     // Geçici ürün kaydını veritabanına ekle (gerçek uygulamada)
     // await addTemporaryProductRecord({
@@ -139,7 +154,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     });
 
   } catch (error) {
-    console.error("Ürün oluşturma hatası:", error);
+    logger.error("Ürün oluşturma hatası", { error }, "api.create-product");
     
     return json<CreateProductResponse>({
       success: false,

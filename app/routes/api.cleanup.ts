@@ -1,5 +1,6 @@
 import { json, type ActionFunctionArgs } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
+import { logger } from "../utils/logger";
 
 interface CleanupResponse {
   success: boolean;
@@ -19,19 +20,23 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     // Geçici ürünleri bul (2 saatten eski olanlar)
     const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
     
-    const products = await admin.product.list({
-      limit: 250,
-      status: "draft",
-      tag: "geçici",
+    const products = await admin.rest.get({
+      path: "products",
+      query: {
+        limit: "250",
+        status: "draft",
+        tag: "geçici"
+      }
     });
 
+    const productsData = await products.json();
     let deletedCount = 0;
     const productsToDelete: string[] = [];
 
-    // Süresi dolmuş ürünleri filtrele
-    for (const product of products.data.products) {
+    // Filter expired products
+    for (const product of productsData.products) {
       const expiresAtMetafield = product.metafields?.find(
-        (meta) => meta.key === "expires_at"
+        (meta: any) => meta.key === "expires_at"
       );
 
       if (expiresAtMetafield?.value) {
@@ -45,16 +50,18 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     // Ürünleri sil
     for (const productId of productsToDelete) {
       try {
-        await admin.product.delete(productId);
+        await admin.rest.delete({
+          path: `products/${productId}`
+        });
         deletedCount++;
-        console.log(`Geçici ürün silindi: ${productId}`);
+        logger.info(`Geçici ürün silindi: ${productId}`, { productId }, "api.cleanup");
       } catch (deleteError) {
-        console.error(`Ürün silinirken hata: ${productId}`, deleteError);
+        logger.error(`Ürün silinirken hata: ${productId}`, { productId, error: deleteError }, "api.cleanup");
       }
     }
 
     // Log kaydı
-    console.log(`Temizlik tamamlandı: ${deletedCount} ürün silindi`);
+    logger.info(`Temizlik tamamlandı: ${deletedCount} ürün silindi`, { deletedCount }, "api.cleanup");
 
     return json<CleanupResponse>({
       success: true,
@@ -63,7 +70,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     });
 
   } catch (error) {
-    console.error("Temizlik hatası:", error);
+    logger.error("Temizlik hatası", { error }, "api.cleanup");
     
     return json<CleanupResponse>({
       success: false,
@@ -80,15 +87,19 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
     const { admin } = await authenticate.admin(request);
     
     // Geçici ürün sayısını getir
-    const products = await admin.product.list({
-      limit: 250,
-      status: "draft",
-      tag: "geçici",
+    const products = await admin.rest.get({
+      path: "products",
+      query: {
+        limit: "250",
+        status: "draft",
+        tag: "geçici"
+      }
     });
 
-    const temporaryProducts = products.data.products.filter(product => {
+    const productsData = await products.json();
+    const temporaryProducts = productsData.products.filter((product: any) => {
       const isTemporaryMetafield = product.metafields?.find(
-        (meta) => meta.key === "is_temporary"
+        (meta: any) => meta.key === "is_temporary"
       );
       return isTemporaryMetafield?.value === "true";
     });
@@ -96,16 +107,16 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
     return json({
       success: true,
       temporaryProductCount: temporaryProducts.length,
-      products: temporaryProducts.map(product => ({
+      products: temporaryProducts.map((product: any) => ({
         id: product.id,
         title: product.title,
-        created_at: product.metafields?.find(meta => meta.key === "created_at")?.value,
-        expires_at: product.metafields?.find(meta => meta.key === "expires_at")?.value,
+        created_at: product.metafields?.find((meta: any) => meta.key === "created_at")?.value,
+        expires_at: product.metafields?.find((meta: any) => meta.key === "expires_at")?.value,
       })),
     });
 
   } catch (error) {
-    console.error("Ürün listesi hatası:", error);
+    logger.error("Ürün listesi hatası", { error }, "api.cleanup");
     
     return json({
       success: false,

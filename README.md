@@ -232,6 +232,26 @@ curl -X POST http://localhost:3000/api/pricing \
 curl -X POST http://localhost:3000/api/cleanup
 ```
 
+## 📊 Log Sistemi
+
+### Log Özellikleri
+- **Log Seviyeleri**: INFO, WARNING, ERROR, DEBUG
+- **Kaynak Takibi**: Her log kaydında hangi API endpoint'ten geldiği belirtilir
+- **Context Bilgisi**: Detaylı bilgiler JSON formatında saklanır
+- **Otomatik Temizlik**: Maksimum 1000 log kaydı tutulur
+- **Hata Alarmı**: Son 1 saatte 10+ hata olursa otomatik uyarı
+
+### Log Görüntüleme
+- **Admin Paneli**: `/app/logs` sayfasından logları görüntüleyin
+- **Filtreleme**: Log seviyesi, kaynak, tarih aralığı ve limit ile filtreleme
+- **İstatistikler**: Toplam, son 1 saat, son 24 saat ve seviye bazında sayılar
+- **Export**: CSV formatında log indirme
+- **Temizlik**: Belirli seviyedeki veya tüm logları temizleme
+
+### API Endpoint'leri
+- **GET /api/logs**: Log listesi ve istatistikler
+- **POST /api/logs**: Log temizleme ve export işlemleri
+
 ## 🚀 Production Deployment
 
 ### 1. Hosting

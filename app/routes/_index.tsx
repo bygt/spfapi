@@ -21,7 +21,6 @@ export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
-  // Fiyat hesaplama katsayıları (gerçek uygulamada veritabanından gelecek)
   const pricingData: PricingData = {
     dimensions: {
       "100-200": 1.0,
@@ -47,7 +46,6 @@ export default function Index() {
     const area = width * height;
     let dimensionCoefficient = 1.0;
 
-    // Boyut katsayısını bul
     if (area <= 20000) dimensionCoefficient = pricingData.dimensions["100-200"];
     else if (area <= 80000) dimensionCoefficient = pricingData.dimensions["201-400"];
     else if (area <= 240000) dimensionCoefficient = pricingData.dimensions["401-600"];
@@ -55,7 +53,7 @@ export default function Index() {
     else dimensionCoefficient = pricingData.dimensions["801+"];
 
     const materialPrice = pricingData.materials[material.toLowerCase()] || 0;
-    const basePrice = 25; // Temel fiyat
+    const basePrice = 25; 
     const calculatedPrice = (basePrice + materialPrice) * dimensionCoefficient;
 
     setEstimatedPrice(Math.round(calculatedPrice));
@@ -75,14 +73,10 @@ export default function Index() {
     setError("");
 
     try {
-      // Burada Shopify API ile geçici ürün oluşturulacak
-      // Şimdilik simüle ediyoruz
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Başarılı mesajı göster
       alert(`Ürün sepete eklendi! Fiyat: ${estimatedPrice} TL`);
       
-      // Formu temizle
       setWidth(0);
       setHeight(0);
       setMaterial("");

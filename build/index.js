@@ -241,7 +241,7 @@ var require_logger = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: !0 });
     exports.logger = void 0;
     var compare_versions_1 = require("compare-versions"), types_1 = require_types(), error_1 = require_error(), version_1 = require_version(), log_1 = require_log();
-    function logger2(config) {
+    function logger3(config) {
       let logFunction = (0, log_1.log)(config);
       return {
         log: logFunction,
@@ -252,7 +252,7 @@ var require_logger = __commonJS({
         deprecated: deprecated2(logFunction)
       };
     }
-    exports.logger = logger2;
+    exports.logger = logger3;
     function deprecated2(logFunction) {
       return function(version, message) {
         if ((0, compare_versions_1.compare)(version_1.SHOPIFY_API_LIBRARY_VERSION, version, ">="))
@@ -339,10 +339,10 @@ var require_flags = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: !0 });
     exports.logDisabledFutureFlags = void 0;
-    function logDisabledFutureFlags3(config, logger2) {
+    function logDisabledFutureFlags3(config, logger3) {
       if (!config._logDisabledFutureFlags)
         return;
-      let logFlag = (flag, message) => logger2.info(`Future flag ${flag} is disabled.
+      let logFlag = (flag, message) => logger3.info(`Future flag ${flag} is disabled.
 
   ${message}
 `);
@@ -435,7 +435,7 @@ var require_config = __commonJS({
         notEmpty2(params[key]) || missing.push(key);
       }), missing.length)
         throw new error_1.ShopifyError(`Cannot initialize Shopify API Library. Missing values for: ${missing.join(", ")}`);
-      let { hostScheme, isCustomStoreApp, adminApiAccessToken, userAgentPrefix, logger: logger2, privateAppStorefrontAccessToken, customShopDomains, billing, ...mandatoryParams } = params;
+      let { hostScheme, isCustomStoreApp, adminApiAccessToken, userAgentPrefix, logger: logger3, privateAppStorefrontAccessToken, customShopDomains, billing, ...mandatoryParams } = params;
       return Object.assign(config, mandatoryParams, {
         hostName: params.hostName.replace(/\/$/, ""),
         scopes: params.scopes instanceof scopes_1.AuthScopes ? params.scopes : new scopes_1.AuthScopes(params.scopes),
@@ -443,7 +443,7 @@ var require_config = __commonJS({
         isCustomStoreApp: isCustomStoreApp ?? config.isCustomStoreApp,
         adminApiAccessToken: adminApiAccessToken ?? config.adminApiAccessToken,
         userAgentPrefix: userAgentPrefix ?? config.userAgentPrefix,
-        logger: { ...config.logger, ...logger2 || {} },
+        logger: { ...config.logger, ...logger3 || {} },
         privateAppStorefrontAccessToken: privateAppStorefrontAccessToken ?? config.privateAppStorefrontAccessToken,
         customShopDomains: customShopDomains ?? config.customShopDomains,
         billing: billing ?? config.billing
@@ -3507,7 +3507,7 @@ __export(root_exports, {
 var import_react2 = require("@remix-run/react");
 
 // app/tailwind.css
-var tailwind_default = "/build/_assets/tailwind-4DHA7ID2.css";
+var tailwind_default = "/build/_assets/tailwind-OXCM2L7A.css";
 
 // app/root.tsx
 var import_jsx_dev_runtime2 = require("react/jsx-dev-runtime"), links = () => [
@@ -3988,14 +3988,14 @@ function loadRestResources({ resources, config, RestClient: RestClient2 }) {
 }
 
 // node_modules/@shopify/shopify-app-remix/node_modules/@shopify/shopify-api/dist/esm/future/flags.mjs
-function logDisabledFutureFlags(config, logger2) {
+function logDisabledFutureFlags(config, logger3) {
   if (!config._logDisabledFutureFlags)
     return;
-  let logFlag = (flag, message) => logger2.info(`Future flag ${flag} is disabled.
+  let logFlag = (flag, message) => logger3.info(`Future flag ${flag} is disabled.
 
   ${message}
 `);
-  config.future?.lineItemBilling || logFlag("lineItemBilling", "Enable this flag to use the new billing API, that supports multiple line items per plan."), config.future?.v10_lineItemBilling && logger2.deprecated("11.0.0", "v10_lineItemBilling will become enabled in v11. Use flag lineItemBilling instead");
+  config.future?.lineItemBilling || logFlag("lineItemBilling", "Enable this flag to use the new billing API, that supports multiple line items per plan."), config.future?.v10_lineItemBilling && logger3.deprecated("11.0.0", "v10_lineItemBilling will become enabled in v11. Use flag lineItemBilling instead");
 }
 
 // node_modules/@shopify/shopify-app-remix/node_modules/@shopify/shopify-api/dist/esm/lib/auth/scopes/index.mjs
@@ -6241,15 +6241,15 @@ var import_jsx_runtime = require("react/jsx-runtime");
 var SHOPIFY_REMIX_LIBRARY_VERSION = "2.8.2";
 
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/webhooks/register.mjs
-function registerWebhooksFactory({ api, logger: logger2 }) {
+function registerWebhooksFactory({ api, logger: logger3 }) {
   return async function({ session }) {
     return api.webhooks.register({ session }).then((response) => (Object.entries(response).forEach(([topic, topicResults]) => {
       topicResults.forEach(({ success, ...rest }) => {
-        success ? logger2.debug("Registered webhook", {
+        success ? logger3.debug("Registered webhook", {
           topic,
           shop: session.shop,
           operation: rest.operation
-        }) : logger2.error("Failed to register webhook", {
+        }) : logger3.error("Failed to register webhook", {
           topic,
           shop: session.shop,
           result: JSON.stringify(rest.result)
@@ -6257,7 +6257,7 @@ function registerWebhooksFactory({ api, logger: logger2 }) {
       });
     }), response)).catch((error) => {
       if ((error.body?.errors?.graphQLErrors || []).find(({ extensions: { code } }) => code === "THROTTLED"))
-        logger2.error("Failed to register webhooks", {
+        logger3.error("Failed to register webhooks", {
           shop: session.shop,
           error: JSON.stringify(error)
         });
@@ -6274,11 +6274,11 @@ var APP_BRIDGE_URL = "https://cdn.shopify.com/shopifycloud/app-bridge.js", REAUT
 
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/helpers/ensure-cors-headers.mjs
 function ensureCORSHeadersFactory(params, request2, corsHeaders = []) {
-  let { logger: logger2, config } = params;
+  let { logger: logger3, config } = params;
   return function(response) {
     let origin = request2.headers.get("Origin");
     if (origin && origin !== config.appUrl) {
-      logger2.debug("Request comes from a different origin, adding CORS headers");
+      logger3.debug("Request comes from a different origin, adding CORS headers");
       let corsHeadersSet = /* @__PURE__ */ new Set([
         "Authorization",
         "Content-Type",
@@ -6298,9 +6298,9 @@ var import_server_runtime = require("@remix-run/server-runtime"), redirectToBoun
 
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/helpers/respond-to-invalid-session-token.mjs
 function respondToInvalidSessionToken({ params, request: request2, retryRequest = !1 }) {
-  let { api, logger: logger2, config } = params;
+  let { api, logger: logger3, config } = params;
   if (!request2.headers.get("authorization"))
-    return redirectToBouncePage({ api, logger: logger2, config }, new URL(request2.url));
+    return redirectToBouncePage({ api, logger: logger3, config }, new URL(request2.url));
   throw new Response(void 0, {
     status: 401,
     statusText: "Unauthorized",
@@ -6310,17 +6310,17 @@ function respondToInvalidSessionToken({ params, request: request2, retryRequest 
 
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/helpers/validate-session-token.mjs
 async function validateSessionToken(params, request2, token, { checkAudience = !0 } = {}) {
-  let { api, logger: logger2 } = params;
-  logger2.debug("Validating session token");
+  let { api, logger: logger3 } = params;
+  logger3.debug("Validating session token");
   try {
     let payload = await api.session.decodeSessionToken(token, {
       checkAudience
     });
-    return logger2.debug("Session token is valid", {
+    return logger3.debug("Session token is valid", {
       payload: JSON.stringify(payload)
     }), payload;
   } catch (error) {
-    throw logger2.debug(`Failed to validate session token: ${error.message}`), respondToInvalidSessionToken({ params, request: request2, retryRequest: !0 });
+    throw logger3.debug(`Failed to validate session token: ${error.message}`), respondToInvalidSessionToken({ params, request: request2, retryRequest: !0 });
   }
 }
 
@@ -6335,14 +6335,14 @@ function getSessionTokenFromUrlParam(request2) {
 
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/helpers/reject-bot-request.mjs
 var import_isbot2 = require("isbot"), SHOPIFY_POS_USER_AGENT = /Shopify POS\//, SHOPIFY_MOBILE_USER_AGENT = /Shopify Mobile\//, SHOPIFY_USER_AGENTS = [SHOPIFY_POS_USER_AGENT, SHOPIFY_MOBILE_USER_AGENT];
-function respondToBotRequest({ logger: logger2 }, request2) {
+function respondToBotRequest({ logger: logger3 }, request2) {
   let userAgent = request2.headers.get("User-Agent") ?? "";
   if (SHOPIFY_USER_AGENTS.some((agent) => agent.test(userAgent))) {
-    logger2.debug("Request is from a Shopify agent, allow");
+    logger3.debug("Request is from a Shopify agent, allow");
     return;
   }
   if ((0, import_isbot2.isbot)(userAgent))
-    throw logger2.debug("Request is from a bot, skipping auth"), new Response(void 0, { status: 410, statusText: "Gone" });
+    throw logger3.debug("Request is from a bot, skipping auth"), new Response(void 0, { status: 410, statusText: "Gone" });
 }
 
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/helpers/respond-to-options-request.mjs
@@ -6409,8 +6409,8 @@ async function redirectToAuthPage(params, request2, shop, isOnline = !1) {
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/admin/billing/cancel.mjs
 function cancelBillingFactory(params, request2, session) {
   return async function(options) {
-    let { api, logger: logger2, config } = params;
-    logger2.debug("Cancelling billing", { shop: session.shop, ...options });
+    let { api, logger: logger3, config } = params;
+    logger3.debug("Cancelling billing", { shop: session.shop, ...options });
     try {
       return await api.billing.cancel({
         session,
@@ -6419,7 +6419,7 @@ function cancelBillingFactory(params, request2, session) {
         prorate: options.prorate
       });
     } catch (error) {
-      throw error instanceof HttpResponseError && error.response.code === 401 ? (logger2.debug("API token was invalid, redirecting to OAuth", {
+      throw error instanceof HttpResponseError && error.response.code === 401 ? (logger3.debug("API token was invalid, redirecting to OAuth", {
         shop: session.shop
       }), await config.sessionStorage.deleteSession(session.id), await redirectToAuthPage(params, request2, session.shop)) : error;
     }
@@ -6429,14 +6429,14 @@ function cancelBillingFactory(params, request2, session) {
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/admin/billing/require.mjs
 var import_server_runtime4 = require("@remix-run/server-runtime");
 function requireBillingFactory(params, request2, session) {
-  let { api, logger: logger2, config } = params;
+  let { api, logger: logger3, config } = params;
   return async function(options) {
     let logContext = {
       shop: session.shop,
       plans: options.plans,
       isTest: options.isTest
     };
-    logger2.debug("Checking billing for the shop", logContext);
+    logger3.debug("Checking billing for the shop", logContext);
     let data;
     try {
       data = await api.billing.check({
@@ -6446,11 +6446,11 @@ function requireBillingFactory(params, request2, session) {
         returnObject: !0
       });
     } catch (error) {
-      throw error instanceof HttpResponseError && error.response.code === 401 ? (logger2.debug("API token was invalid, redirecting to OAuth", logContext), await config.sessionStorage.deleteSession(session.id), await redirectToAuthPage(params, request2, session.shop)) : error;
+      throw error instanceof HttpResponseError && error.response.code === 401 ? (logger3.debug("API token was invalid, redirecting to OAuth", logContext), await config.sessionStorage.deleteSession(session.id), await redirectToAuthPage(params, request2, session.shop)) : error;
     }
     if (!data.hasActivePayment)
-      throw logger2.debug("Billing check failed", logContext), await options.onFailure(new Error("Billing check failed"));
-    return logger2.debug("Billing check succeeded", logContext), data;
+      throw logger3.debug("Billing check failed", logContext), await options.onFailure(new Error("Billing check failed"));
+    return logger3.debug("Billing check succeeded", logContext), data;
   };
 }
 
@@ -6458,8 +6458,8 @@ function requireBillingFactory(params, request2, session) {
 var import_server_runtime5 = require("@remix-run/server-runtime");
 function requestBillingFactory(params, request2, session) {
   return async function({ plan, isTest, returnUrl, ...overrides }) {
-    let { api, logger: logger2, config } = params;
-    logger2.info("Requesting billing", {
+    let { api, logger: logger3, config } = params;
+    logger3.info("Requesting billing", {
       shop: session.shop,
       plan,
       isTest,
@@ -6476,7 +6476,7 @@ function requestBillingFactory(params, request2, session) {
         ...overrides
       });
     } catch (error) {
-      throw error instanceof HttpResponseError && error.response.code === 401 ? (logger2.debug("API token was invalid, redirecting to OAuth", {
+      throw error instanceof HttpResponseError && error.response.code === 401 ? (logger3.debug("API token was invalid, redirecting to OAuth", {
         shop: session.shop
       }), await config.sessionStorage.deleteSession(session.id), await redirectToAuthPage(params, request2, session.shop)) : error;
     }
@@ -6484,8 +6484,8 @@ function requestBillingFactory(params, request2, session) {
   };
 }
 function redirectOutOfApp(params, request2, url, shop) {
-  let { config, logger: logger2 } = params;
-  logger2.debug("Redirecting out of app", { url });
+  let { config, logger: logger3 } = params;
+  logger3.debug("Redirecting out of app", { url });
   let requestUrl = new URL(request2.url), isEmbeddedRequest2 = requestUrl.searchParams.get("embedded") === "1";
   if (request2.headers.get("authorization"))
     throw new Response(void 0, {
@@ -6508,8 +6508,8 @@ function redirectOutOfApp(params, request2, url, shop) {
 var import_server_runtime6 = require("@remix-run/server-runtime");
 function checkBillingFactory(params, request2, session) {
   return async function(options) {
-    let { api, logger: logger2, config } = params;
-    logger2.debug("Checking billing plans", { shop: session.shop, ...options });
+    let { api, logger: logger3, config } = params;
+    logger3.debug("Checking billing plans", { shop: session.shop, ...options });
     try {
       return await api.billing.check({
         session,
@@ -6518,7 +6518,7 @@ function checkBillingFactory(params, request2, session) {
         returnObject: !0
       });
     } catch (error) {
-      throw error instanceof HttpResponseError && error.response.code === 401 ? (logger2.debug("API token was invalid, redirecting to OAuth", {
+      throw error instanceof HttpResponseError && error.response.code === 401 ? (logger3.debug("API token was invalid, redirecting to OAuth", {
         shop: session.shop
       }), await config.sessionStorage.deleteSession(session.id), await redirectToAuthPage(params, request2, session.shop)) : error;
     }
@@ -6671,14 +6671,14 @@ async function redirectToShopifyOrAppRoot(request2, params, responseHeaders) {
 
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/admin/helpers/ensure-app-is-embedded-if-required.mjs
 var ensureAppIsEmbeddedIfRequired = async (params, request2) => {
-  let { api, logger: logger2, config } = params, url = new URL(request2.url), shop = url.searchParams.get("shop");
-  api.config.isEmbeddedApp && url.searchParams.get("embedded") !== "1" && (logger2.debug("App is not embedded, redirecting to Shopify", { shop }), await redirectToShopifyOrAppRoot(request2, { api, logger: logger2, config }));
+  let { api, logger: logger3, config } = params, url = new URL(request2.url), shop = url.searchParams.get("shop");
+  api.config.isEmbeddedApp && url.searchParams.get("embedded") !== "1" && (logger3.debug("App is not embedded, redirecting to Shopify", { shop }), await redirectToShopifyOrAppRoot(request2, { api, logger: logger3, config }));
 };
 
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/admin/helpers/ensure-session-token-search-param-if-required.mjs
 var SESSION_TOKEN_PARAM2 = "id_token", ensureSessionTokenSearchParamIfRequired = async (params, request2) => {
-  let { api, logger: logger2 } = params, url = new URL(request2.url), shop = url.searchParams.get("shop"), searchParamSessionToken = url.searchParams.get(SESSION_TOKEN_PARAM2), isEmbedded = url.searchParams.get("embedded") === "1";
-  api.config.isEmbeddedApp && isEmbedded && !searchParamSessionToken && (logger2.debug("Missing session token in search params, going to bounce page", { shop }), redirectToBouncePage(params, url));
+  let { api, logger: logger3 } = params, url = new URL(request2.url), shop = url.searchParams.get("shop"), searchParamSessionToken = url.searchParams.get(SESSION_TOKEN_PARAM2), isEmbedded = url.searchParams.get("embedded") === "1";
+  api.config.isEmbeddedApp && isEmbedded && !searchParamSessionToken && (logger3.debug("Missing session token in search params, going to bounce page", { shop }), redirectToBouncePage(params, url));
 };
 
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/admin/helpers/redirect.mjs
@@ -6782,15 +6782,15 @@ function isEmbeddedRequest(request2) {
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/admin/helpers/validate-shop-and-host-params.mjs
 var import_server_runtime9 = require("@remix-run/server-runtime");
 function validateShopAndHostParams(params, request2) {
-  let { api, config, logger: logger2 } = params;
+  let { api, config, logger: logger3 } = params;
   if (config.isEmbeddedApp) {
     let url = new URL(request2.url), shop = api.utils.sanitizeShop(url.searchParams.get("shop"));
     if (!shop)
-      throw logger2.debug("Missing or invalid shop, redirecting to login path", {
+      throw logger3.debug("Missing or invalid shop, redirecting to login path", {
         shop
       }), (0, import_server_runtime9.redirect)(config.auth.loginPath);
     if (!api.utils.sanitizeHost(url.searchParams.get("host")))
-      throw logger2.debug("Invalid host, redirecting to login path", {
+      throw logger3.debug("Invalid host, redirecting to login path", {
         host: url.searchParams.get("host")
       }), (0, import_server_runtime9.redirect)(config.auth.loginPath);
   }
@@ -6798,16 +6798,16 @@ function validateShopAndHostParams(params, request2) {
 
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/admin/authenticate.mjs
 function authStrategyFactory({ strategy, ...params }) {
-  let { api, logger: logger2, config } = params;
+  let { api, logger: logger3, config } = params;
   async function respondToBouncePageRequest(request2) {
     if (new URL(request2.url).pathname === config.auth.patchSessionTokenPath)
-      throw logger2.debug("Rendering bounce page"), renderAppBridge({ config, logger: logger2, api }, request2);
+      throw logger3.debug("Rendering bounce page"), renderAppBridge({ config, logger: logger3, api }, request2);
   }
   async function respondToExitIframeRequest(request2) {
     let url = new URL(request2.url);
     if (url.pathname === config.auth.exitIframePath) {
       let destination = url.searchParams.get("exitIframe");
-      throw logger2.debug("Rendering exit iframe page", { destination }), renderAppBridge({ config, logger: logger2, api }, request2, { url: destination });
+      throw logger3.debug("Rendering exit iframe page", { destination }), renderAppBridge({ config, logger: logger3, api }, request2, { url: destination });
     }
   }
   function createContext(request2, session, authStrategy, sessionToken) {
@@ -6830,15 +6830,15 @@ function authStrategyFactory({ strategy, ...params }) {
   }
   return async function(request2) {
     try {
-      respondToBotRequest(params, request2), respondToOptionsRequest(params, request2), await respondToBouncePageRequest(request2), await respondToExitIframeRequest(request2), await strategy.respondToOAuthRequests(request2), getSessionTokenHeader(request2) || (validateShopAndHostParams(params, request2), await ensureAppIsEmbeddedIfRequired(params, request2), await ensureSessionTokenSearchParamIfRequired(params, request2)), logger2.info("Authenticating admin request");
+      respondToBotRequest(params, request2), respondToOptionsRequest(params, request2), await respondToBouncePageRequest(request2), await respondToExitIframeRequest(request2), await strategy.respondToOAuthRequests(request2), getSessionTokenHeader(request2) || (validateShopAndHostParams(params, request2), await ensureAppIsEmbeddedIfRequired(params, request2), await ensureSessionTokenSearchParamIfRequired(params, request2)), logger3.info("Authenticating admin request");
       let { payload, shop, sessionId, sessionToken } = await getSessionTokenContext(params, request2);
-      logger2.debug("Loading session from storage", { sessionId });
+      logger3.debug("Loading session from storage", { sessionId });
       let existingSession = sessionId ? await config.sessionStorage.loadSession(sessionId) : void 0, session = await strategy.authenticate(request2, {
         session: existingSession,
         sessionToken,
         shop
       });
-      return logger2.debug("Request is valid, loaded session from session token", {
+      return logger3.debug("Request is valid, loaded session from session token", {
         shop: session.shop,
         isOnline: session.isOnline
       }), createContext(request2, session, strategy, payload);
@@ -6848,15 +6848,15 @@ function authStrategyFactory({ strategy, ...params }) {
   };
 }
 async function getSessionTokenContext(params, request2) {
-  let { api, config, logger: logger2 } = params, headerSessionToken = getSessionTokenHeader(request2), searchParamSessionToken = getSessionTokenFromUrlParam(request2), sessionToken = headerSessionToken || searchParamSessionToken;
-  if (logger2.debug("Attempting to authenticate session token", {
+  let { api, config, logger: logger3 } = params, headerSessionToken = getSessionTokenHeader(request2), searchParamSessionToken = getSessionTokenFromUrlParam(request2), sessionToken = headerSessionToken || searchParamSessionToken;
+  if (logger3.debug("Attempting to authenticate session token", {
     sessionToken: JSON.stringify({
       header: headerSessionToken,
       search: searchParamSessionToken
     })
   }), config.isEmbeddedApp) {
     let payload = await validateSessionToken(params, request2, sessionToken), shop2 = new URL(payload.dest).hostname;
-    logger2.debug("Session token is valid", { shop: shop2, payload });
+    logger3.debug("Session token is valid", { shop: shop2, payload });
     let sessionId2 = config.useOnlineTokens ? api.session.getJwtSessionId(shop2, payload.sub) : api.session.getOfflineId(shop2);
     return { shop: shop2, payload, sessionId: sessionId2, sessionToken };
   }
@@ -6888,10 +6888,10 @@ function handleClientErrorFactory({ request: request2, onError }) {
 
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/webhooks/authenticate.mjs
 function authenticateWebhookFactory(params) {
-  let { api, config, logger: logger2 } = params;
+  let { api, config, logger: logger3 } = params;
   return async function(request2) {
     if (request2.method !== "POST")
-      throw logger2.debug("Received a non-POST request for a webhook. Only POST requests are allowed.", { url: request2.url, method: request2.method }), new Response(void 0, {
+      throw logger3.debug("Received a non-POST request for a webhook. Only POST requests are allowed.", { url: request2.url, method: request2.method }), new Response(void 0, {
         status: 405,
         statusText: "Method not allowed"
       });
@@ -6900,10 +6900,10 @@ function authenticateWebhookFactory(params) {
       rawRequest: request2
     });
     if (!check2.valid)
-      throw check2.reason === WebhookValidationErrorReason.InvalidHmac ? (logger2.debug("Webhook HMAC validation failed", check2), new Response(void 0, {
+      throw check2.reason === WebhookValidationErrorReason.InvalidHmac ? (logger3.debug("Webhook HMAC validation failed", check2), new Response(void 0, {
         status: 401,
         statusText: "Unauthorized"
-      })) : (logger2.debug("Webhook validation failed", check2), new Response(void 0, { status: 400, statusText: "Bad Request" }));
+      })) : (logger3.debug("Webhook validation failed", check2), new Response(void 0, { status: 400, statusText: "Bad Request" }));
     let sessionId = api.session.getOfflineId(check2.domain), session = await config.sessionStorage.loadSession(sessionId), webhookContext = {
       apiVersion: check2.apiVersion,
       shop: check2.domain,
@@ -6948,8 +6948,8 @@ function authenticateWebhookFactory(params) {
 
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/override-logger.mjs
 var import_semver = __toESM(require("semver"), 1);
-function overrideLogger(logger2) {
-  let baseContext = { package: "shopify-app" }, warningFunction = (message, context = {}) => logger2.warning(message, { ...baseContext, ...context });
+function overrideLogger(logger3) {
+  let baseContext = { package: "shopify-app" }, warningFunction = (message, context = {}) => logger3.warning(message, { ...baseContext, ...context });
   function deprecated2(warningFunction2) {
     return function(version, message) {
       if (import_semver.default.gte(SHOPIFY_REMIX_LIBRARY_VERSION, version))
@@ -6958,12 +6958,12 @@ function overrideLogger(logger2) {
     };
   }
   return {
-    ...logger2,
-    log: (severity, message, context = {}) => logger2.log(severity, message, { ...baseContext, ...context }),
-    debug: (message, context = {}) => logger2.debug(message, { ...baseContext, ...context }),
-    info: (message, context = {}) => logger2.info(message, { ...baseContext, ...context }),
+    ...logger3,
+    log: (severity, message, context = {}) => logger3.log(severity, message, { ...baseContext, ...context }),
+    debug: (message, context = {}) => logger3.debug(message, { ...baseContext, ...context }),
+    info: (message, context = {}) => logger3.info(message, { ...baseContext, ...context }),
     warning: warningFunction,
-    error: (message, context = {}) => logger2.error(message, { ...baseContext, ...context }),
+    error: (message, context = {}) => logger3.error(message, { ...baseContext, ...context }),
     deprecated: deprecated2(warningFunction)
   };
 }
@@ -6974,19 +6974,19 @@ var import_server_runtime16 = require("@remix-run/server-runtime"), import_isbot
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/login/login.mjs
 var import_server_runtime12 = require("@remix-run/server-runtime");
 function loginFactory(params) {
-  let { api, config, logger: logger2 } = params;
+  let { api, config, logger: logger3 } = params;
   return async function(request2) {
     let shopParam = new URL(request2.url).searchParams.get("shop");
     if (request2.method === "GET" && !shopParam)
       return {};
     let shop = shopParam || (await request2.formData()).get("shop");
     if (!shop)
-      return logger2.debug("Missing shop parameter", { shop }), { shop: LoginErrorType.MissingShop };
+      return logger3.debug("Missing shop parameter", { shop }), { shop: LoginErrorType.MissingShop };
     let shopWithoutProtocol = shop.replace(/^https?:\/\//, "").replace(/\/$/, ""), shopWithDomain = shop?.indexOf(".") === -1 ? `${shopWithoutProtocol}.myshopify.com` : shopWithoutProtocol, sanitizedShop = api.utils.sanitizeShop(shopWithDomain);
     if (!sanitizedShop)
-      return logger2.debug("Invalid shop parameter", { shop }), { shop: LoginErrorType.InvalidShop };
+      return logger3.debug("Invalid shop parameter", { shop }), { shop: LoginErrorType.InvalidShop };
     let authPath = `${config.appUrl}${config.auth.path}?shop=${sanitizedShop}`, installPath = `https://${api.utils.legacyUrlToShopAdminUrl(sanitizedShop)}/oauth/install?client_id=${config.apiKey}`, redirectUrl = config.isEmbeddedApp && config.future.unstable_newEmbeddedAuthStrategy ? installPath : authPath;
-    throw logger2.info(`Redirecting login request to ${redirectUrl}`, {
+    throw logger3.info(`Redirecting login request to ${redirectUrl}`, {
       shop: sanitizedShop
     }), (0, import_server_runtime12.redirect)(redirectUrl);
   };
@@ -7019,11 +7019,11 @@ function unauthenticatedAdminContextFactory(params) {
 var import_server_runtime13 = require("@remix-run/server-runtime");
 function authenticateCheckoutFactory(params) {
   return async function(request2, options = {}) {
-    let { logger: logger2 } = params, corsHeaders = options.corsHeaders ?? [];
+    let { logger: logger3 } = params, corsHeaders = options.corsHeaders ?? [];
     respondToBotRequest(params, request2), respondToOptionsRequest(params, request2, corsHeaders);
     let sessionTokenHeader = getSessionTokenHeader(request2);
-    if (logger2.info("Authenticating checkout request"), !sessionTokenHeader)
-      throw logger2.debug("Request did not contain a session token"), new Response(void 0, {
+    if (logger3.info("Authenticating checkout request"), !sessionTokenHeader)
+      throw logger3.debug("Request did not contain a session token"), new Response(void 0, {
         status: 401,
         statusText: "Unauthorized"
       });
@@ -7054,12 +7054,12 @@ function storefrontClientFactory({ params, session }) {
 
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/public/appProxy/authenticate.mjs
 function authenticateAppProxyFactory(params) {
-  let { api, config, logger: logger2 } = params;
+  let { api, config, logger: logger3 } = params;
   return async function(request2) {
-    logger2.info("Authenticating app proxy request");
+    logger3.info("Authenticating app proxy request");
     let url = new URL(request2.url);
     if (!await validateAppProxyHmac(params, url))
-      throw logger2.info("App proxy request has invalid signature"), new Response(void 0, {
+      throw logger3.info("App proxy request has invalid signature"), new Response(void 0, {
         status: 400,
         statusText: "Bad Request"
       });
@@ -7093,7 +7093,7 @@ var liquid = (body, initAndOptions) => {
   });
 };
 async function validateAppProxyHmac(params, url) {
-  let { api, logger: logger2 } = params;
+  let { api, logger: logger3 } = params;
   try {
     let searchParams = new URLSearchParams(url.search);
     searchParams.get("index") || searchParams.delete("index");
@@ -7107,7 +7107,7 @@ async function validateAppProxyHmac(params, url) {
     }
     return isValid;
   } catch (error) {
-    throw logger2.info(error.message), new Response(void 0, { status: 400, statusText: "Bad Request" });
+    throw logger3.info(error.message), new Response(void 0, { status: 400, statusText: "Bad Request" });
   }
 }
 function processLiquidBody(body) {
@@ -7116,13 +7116,13 @@ function processLiquidBody(body) {
 
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/public/factory.mjs
 function authenticatePublicFactory(params) {
-  let { logger: logger2, config } = params, authenticateCheckout = authenticateCheckoutFactory(params), authenticateAppProxy = authenticateAppProxyFactory(params);
+  let { logger: logger3, config } = params, authenticateCheckout = authenticateCheckoutFactory(params), authenticateAppProxy = authenticateAppProxyFactory(params);
   if (config.future.v3_authenticatePublic)
     return {
       checkout: authenticateCheckout,
       appProxy: authenticateAppProxy
     };
-  let authenticatePublic = (request2, options) => (logger2.deprecated("3.0.0", "authenticate.public() will be deprecated in v3. Use authenticate.public.checkout() instead."), authenticateCheckout(request2, options));
+  let authenticatePublic = (request2, options) => (logger3.deprecated("3.0.0", "authenticate.public() will be deprecated in v3. Use authenticate.public.checkout() instead."), authenticateCheckout(request2, options));
   return authenticatePublic.checkout = authenticateCheckout, authenticatePublic.appProxy = authenticateAppProxy, authenticatePublic;
 }
 
@@ -7144,8 +7144,8 @@ var import_server_runtime14 = require("@remix-run/server-runtime");
 
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/admin/helpers/trigger-after-auth-hook.mjs
 async function triggerAfterAuthHook(params, session, request2, authStrategy) {
-  let { config, logger: logger2 } = params;
-  config.hooks.afterAuth && (logger2.info("Running afterAuth hook"), await config.hooks.afterAuth({
+  let { config, logger: logger3 } = params;
+  config.hooks.afterAuth && (logger3.info("Running afterAuth hook"), await config.hooks.afterAuth({
     session,
     admin: createAdminApiContext(session, params, authStrategy.handleClientError(request2))
   }));
@@ -7153,8 +7153,8 @@ async function triggerAfterAuthHook(params, session, request2, authStrategy) {
 
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/admin/strategies/auth-code-flow.mjs
 var import_isbot3 = require("isbot"), AuthCodeFlowStrategy = class {
-  constructor({ api, config, logger: logger2 }) {
-    this.api = api, this.config = config, this.logger = logger2;
+  constructor({ api, config, logger: logger3 }) {
+    this.api = api, this.config = config, this.logger = logger3;
   }
   async respondToOAuthRequests(request2) {
     let { api, config } = this, url = new URL(request2.url), isAuthRequest = url.pathname === config.auth.path, isAuthCallbackRequest = url.pathname === config.auth.callbackPath;
@@ -7165,57 +7165,57 @@ var import_isbot3 = require("isbot"), AuthCodeFlowStrategy = class {
     getSessionTokenHeader(request2) || await this.ensureInstalledOnShop(request2);
   }
   async authenticate(request2, sessionContext) {
-    let { api, config, logger: logger2 } = this, { shop, session } = sessionContext;
-    return session ? session.isActive(config.scopes) || (logger2.debug("Found a session, but it has expired, redirecting to OAuth", { shop }), await redirectToAuthPage({ config, logger: logger2, api }, request2, shop)) : (logger2.debug("No session found, redirecting to OAuth", { shop }), await redirectToAuthPage({ config, logger: logger2, api }, request2, shop)), logger2.debug("Found a valid session", { shop }), session;
+    let { api, config, logger: logger3 } = this, { shop, session } = sessionContext;
+    return session ? session.isActive(config.scopes) || (logger3.debug("Found a session, but it has expired, redirecting to OAuth", { shop }), await redirectToAuthPage({ config, logger: logger3, api }, request2, shop)) : (logger3.debug("No session found, redirecting to OAuth", { shop }), await redirectToAuthPage({ config, logger: logger3, api }, request2, shop)), logger3.debug("Found a valid session", { shop }), session;
   }
   handleClientError(request2) {
-    let { api, config, logger: logger2 } = this;
+    let { api, config, logger: logger3 } = this;
     return handleClientErrorFactory({
       request: request2,
       onError: async ({ session, error }) => {
         if (error.response.code === 401)
-          throw await redirectToAuthPage({ api, config, logger: logger2 }, request2, session.shop);
+          throw await redirectToAuthPage({ api, config, logger: logger3 }, request2, session.shop);
       }
     });
   }
   async ensureInstalledOnShop(request2) {
-    let { api, config, logger: logger2 } = this;
-    validateShopAndHostParams({ api, config, logger: logger2 }, request2);
+    let { api, config, logger: logger3 } = this;
+    validateShopAndHostParams({ api, config, logger: logger3 }, request2);
     let url = new URL(request2.url), shop = url.searchParams.get("shop");
-    if (logger2.debug("Ensuring app is installed on shop", { shop }), !await this.hasValidOfflineId(request2))
-      throw logger2.info("Could not find a shop, can't authenticate request"), new Response(void 0, {
+    if (logger3.debug("Ensuring app is installed on shop", { shop }), !await this.hasValidOfflineId(request2))
+      throw logger3.info("Could not find a shop, can't authenticate request"), new Response(void 0, {
         status: 400,
         statusText: "Bad Request"
       });
     let offlineSession = await this.getOfflineSession(request2), isEmbedded = url.searchParams.get("embedded") === "1";
     if (!offlineSession)
-      if (logger2.info("Shop hasn't installed app yet, redirecting to OAuth", {
+      if (logger3.info("Shop hasn't installed app yet, redirecting to OAuth", {
         shop
       }), isEmbedded)
-        redirectWithExitIframe({ api, config, logger: logger2 }, request2, shop);
+        redirectWithExitIframe({ api, config, logger: logger3 }, request2, shop);
       else
-        throw await beginAuth({ api, config, logger: logger2 }, request2, !1, shop);
+        throw await beginAuth({ api, config, logger: logger3 }, request2, !1, shop);
     if (shop = shop || offlineSession.shop, config.isEmbeddedApp && !isEmbedded)
       try {
-        logger2.debug("Ensuring offline session is valid before embedding", {
+        logger3.debug("Ensuring offline session is valid before embedding", {
           shop
-        }), await this.testSession(offlineSession), logger2.debug("Offline session is still valid, embedding app", { shop });
+        }), await this.testSession(offlineSession), logger3.debug("Offline session is still valid, embedding app", { shop });
       } catch (error) {
         await this.handleInvalidOfflineSession(error, request2, shop);
       }
   }
   async handleAuthBeginRequest(request2, shop) {
-    let { api, config, logger: logger2 } = this;
-    throw logger2.info("Handling OAuth begin request", { shop }), config.isEmbeddedApp && request2.headers.get("Sec-Fetch-Dest") === "iframe" ? (logger2.debug("Auth request in iframe detected, exiting iframe", { shop }), redirectWithExitIframe({ api, config, logger: logger2 }, request2, shop)) : await beginAuth({ api, config, logger: logger2 }, request2, !1, shop);
+    let { api, config, logger: logger3 } = this;
+    throw logger3.info("Handling OAuth begin request", { shop }), config.isEmbeddedApp && request2.headers.get("Sec-Fetch-Dest") === "iframe" ? (logger3.debug("Auth request in iframe detected, exiting iframe", { shop }), redirectWithExitIframe({ api, config, logger: logger3 }, request2, shop)) : await beginAuth({ api, config, logger: logger3 }, request2, !1, shop);
   }
   async handleAuthCallbackRequest(request2, shop) {
-    let { api, config, logger: logger2 } = this;
-    logger2.info("Handling OAuth callback request");
+    let { api, config, logger: logger3 } = this;
+    logger3.info("Handling OAuth callback request");
     try {
       let { session, headers: responseHeaders } = await api.auth.callback({
         rawRequest: request2
       });
-      throw await config.sessionStorage.storeSession(session), config.useOnlineTokens && !session.isOnline && (logger2.info("Requesting online access token for offline session"), await beginAuth({ api, config, logger: logger2 }, request2, !0, shop)), await triggerAfterAuthHook({ api, config, logger: logger2 }, session, request2, this), await redirectToShopifyOrAppRoot(request2, { api, config, logger: logger2 }, responseHeaders);
+      throw await config.sessionStorage.storeSession(session), config.useOnlineTokens && !session.isOnline && (logger3.info("Requesting online access token for offline session"), await beginAuth({ api, config, logger: logger3 }, request2, !0, shop)), await triggerAfterAuthHook({ api, config, logger: logger3 }, session, request2, this), await redirectToShopifyOrAppRoot(request2, { api, config, logger: logger3 }, responseHeaders);
     } catch (error) {
       throw error instanceof Response ? error : await this.oauthCallbackError(error, request2, shop);
     }
@@ -7244,8 +7244,8 @@ var import_isbot3 = require("isbot"), AuthCodeFlowStrategy = class {
     `);
   }
   async oauthCallbackError(error, request2, shop) {
-    let { logger: logger2 } = this;
-    return logger2.error("Error during OAuth callback", { error: error.message }), error instanceof CookieNotFound ? this.handleAuthBeginRequest(request2, shop) : error instanceof InvalidHmacError || error instanceof InvalidOAuthError ? new Response(void 0, {
+    let { logger: logger3 } = this;
+    return logger3.error("Error during OAuth callback", { error: error.message }), error instanceof CookieNotFound ? this.handleAuthBeginRequest(request2, shop) : error instanceof InvalidHmacError || error instanceof InvalidOAuthError ? new Response(void 0, {
       status: 400,
       statusText: "Invalid OAuth Request"
     }) : new Response(void 0, {
@@ -7254,15 +7254,15 @@ var import_isbot3 = require("isbot"), AuthCodeFlowStrategy = class {
     });
   }
   async handleInvalidOfflineSession(error, request2, shop) {
-    let { api, logger: logger2, config } = this;
+    let { api, logger: logger3, config } = this;
     if (error instanceof HttpResponseError) {
       if (error.response.code === 401)
-        throw logger2.info("Shop session is no longer valid, redirecting to OAuth", {
+        throw logger3.info("Shop session is no longer valid, redirecting to OAuth", {
           shop
-        }), await beginAuth({ api, config, logger: logger2 }, request2, !1, shop);
+        }), await beginAuth({ api, config, logger: logger3 }, request2, !1, shop);
       {
         let message = JSON.stringify(error.response.body, null, 2);
-        throw logger2.error(`Unexpected error during session validation: ${message}`, {
+        throw logger3.error(`Unexpected error during session validation: ${message}`, {
           shop
         }), new Response(void 0, {
           status: error.response.code,
@@ -7271,7 +7271,7 @@ var import_isbot3 = require("isbot"), AuthCodeFlowStrategy = class {
       }
     } else if (error instanceof GraphqlQueryError) {
       let context = { shop };
-      throw error.response && (context.response = JSON.stringify(error.body)), logger2.error(`Unexpected error during session validation: ${error.message}`, context), new Response(void 0, {
+      throw error.response && (context.response = JSON.stringify(error.body)), logger3.error(`Unexpected error during session validation: ${error.message}`, context), new Response(void 0, {
         status: 500,
         statusText: "Internal Server Error"
       });
@@ -7282,17 +7282,17 @@ var import_isbot3 = require("isbot"), AuthCodeFlowStrategy = class {
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/admin/strategies/token-exchange.mjs
 var import_isbot4 = require("isbot"), import_server_runtime15 = require("@remix-run/server-runtime");
 var TokenExchangeStrategy = class {
-  constructor({ api, config, logger: logger2 }) {
-    this.api = api, this.config = config, this.logger = logger2;
+  constructor({ api, config, logger: logger3 }) {
+    this.api = api, this.config = config, this.logger = logger3;
   }
   async respondToOAuthRequests(_request) {
   }
   async authenticate(request2, sessionContext) {
-    let { api, config, logger: logger2 } = this, { shop, session, sessionToken } = sessionContext;
+    let { api, config, logger: logger3 } = this, { shop, session, sessionToken } = sessionContext;
     if (!sessionToken)
       throw new InvalidJwtError();
     if (!session || session.isExpired()) {
-      logger2.info("No valid session found"), logger2.info("Requesting offline access token");
+      logger3.info("No valid session found"), logger3.info("Requesting offline access token");
       let { session: offlineSession } = await this.exchangeToken({
         request: request2,
         sessionToken,
@@ -7302,7 +7302,7 @@ var TokenExchangeStrategy = class {
       await config.sessionStorage.storeSession(offlineSession);
       let newSession = offlineSession;
       if (config.useOnlineTokens) {
-        logger2.info("Requesting online access token");
+        logger3.info("Requesting online access token");
         let { session: onlineSession } = await this.exchangeToken({
           request: request2,
           sessionToken,
@@ -7312,7 +7312,7 @@ var TokenExchangeStrategy = class {
         await config.sessionStorage.storeSession(onlineSession), newSession = onlineSession;
       }
       try {
-        await this.handleAfterAuthHook({ api, config, logger: logger2 }, newSession, request2, sessionToken);
+        await this.handleAfterAuthHook({ api, config, logger: logger3 }, newSession, request2, sessionToken);
       } catch {
         throw new Response(void 0, {
           status: 500,
@@ -7324,19 +7324,19 @@ var TokenExchangeStrategy = class {
     return session;
   }
   handleClientError(request2) {
-    let { api, config, logger: logger2 } = this;
+    let { api, config, logger: logger3 } = this;
     return handleClientErrorFactory({
       request: request2,
       onError: async ({ session, error }) => {
         error.response.code === 401 && (config.sessionStorage.deleteSession(session.id), respondToInvalidSessionToken({
-          params: { config, api, logger: logger2 },
+          params: { config, api, logger: logger3 },
           request: request2
         }));
       }
     });
   }
   async exchangeToken({ request: request2, shop, sessionToken, requestedTokenType }) {
-    let { api, config, logger: logger2 } = this;
+    let { api, config, logger: logger3 } = this;
     try {
       return await api.auth.tokenExchange({
         sessionToken,
@@ -7345,7 +7345,7 @@ var TokenExchangeStrategy = class {
       });
     } catch (error) {
       throw error instanceof InvalidJwtError || error instanceof HttpResponseError && error.response.code === 400 && error.response.body?.error === "invalid_subject_token" ? respondToInvalidSessionToken({
-        params: { api, config, logger: logger2 },
+        params: { api, config, logger: logger3 },
         request: request2,
         retryRequest: !0
       }) : new Response(void 0, {
@@ -7388,10 +7388,10 @@ var IdempotentPromiseHandler = class {
 
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/flow/authenticate.mjs
 function authenticateFlowFactory(params) {
-  let { api, config, logger: logger2 } = params;
+  let { api, config, logger: logger3 } = params;
   return async function(request2) {
-    if (logger2.info("Authenticating flow request"), request2.method !== "POST")
-      throw logger2.debug("Received a non-POST request for flow. Only POST requests are allowed.", { url: request2.url, method: request2.method }), new Response(void 0, {
+    if (logger3.info("Authenticating flow request"), request2.method !== "POST")
+      throw logger3.debug("Received a non-POST request for flow. Only POST requests are allowed.", { url: request2.url, method: request2.method }), new Response(void 0, {
         status: 405,
         statusText: "Method not allowed"
       });
@@ -7400,23 +7400,23 @@ function authenticateFlowFactory(params) {
       rawRequest: request2
     });
     if (!result.valid)
-      throw logger2.error("Received an invalid flow request", { reason: result.reason }), new Response(void 0, {
+      throw logger3.error("Received an invalid flow request", { reason: result.reason }), new Response(void 0, {
         status: 400,
         statusText: "Bad Request"
       });
     let payload = JSON.parse(rawBody);
-    logger2.debug("Flow request is valid, looking for an offline session", {
+    logger3.debug("Flow request is valid, looking for an offline session", {
       shop: payload.shopify_domain
     });
     let sessionId = api.session.getOfflineId(payload.shopify_domain), session = await config.sessionStorage.loadSession(sessionId);
     if (!session)
-      throw logger2.info("Flow request could not find session", {
+      throw logger3.info("Flow request could not find session", {
         shop: payload.shopify_domain
       }), new Response(void 0, {
         status: 400,
         statusText: "Bad Request"
       });
-    return logger2.debug("Found a session for the flow request", { shop: session.shop }), {
+    return logger3.debug("Found a session for the flow request", { shop: session.shop }), {
       session,
       payload,
       admin: adminClientFactory({ params, session })
@@ -7426,10 +7426,10 @@ function authenticateFlowFactory(params) {
 
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/authenticate/fulfillment-service/authenticate.mjs
 function authenticateFulfillmentServiceFactory(params) {
-  let { api, config, logger: logger2 } = params;
+  let { api, config, logger: logger3 } = params;
   return async function(request2) {
-    if (logger2.info("Authenticating fulfillment service request"), request2.method !== "POST")
-      throw logger2.debug("Received a non-POST request for fulfillment service. Only POST requests are allowed.", { url: request2.url, method: request2.method }), new Response(void 0, {
+    if (logger3.info("Authenticating fulfillment service request"), request2.method !== "POST")
+      throw logger3.debug("Received a non-POST request for fulfillment service. Only POST requests are allowed.", { url: request2.url, method: request2.method }), new Response(void 0, {
         status: 405,
         statusText: "Method not allowed"
       });
@@ -7438,25 +7438,25 @@ function authenticateFulfillmentServiceFactory(params) {
       rawRequest: request2
     });
     if (!result.valid)
-      throw logger2.error("Received an invalid fulfillment service request", {
+      throw logger3.error("Received an invalid fulfillment service request", {
         reason: result.reason
       }), new Response(void 0, {
         status: 400,
         statusText: "Bad Request"
       });
     let payload = JSON.parse(rawBody), shop = request2.headers.get(ShopifyHeader.Domain) || "";
-    logger2.debug("Fulfillment service request is valid, looking for an offline session", {
+    logger3.debug("Fulfillment service request is valid, looking for an offline session", {
       shop
     });
     let sessionId = api.session.getOfflineId(shop), session = await config.sessionStorage.loadSession(sessionId);
     if (!session)
-      throw logger2.info("Fulfillment service request could not find session", {
+      throw logger3.info("Fulfillment service request could not find session", {
         shop
       }), new Response(void 0, {
         status: 400,
         statusText: "Bad Request"
       });
-    return logger2.debug("Found a session for the fulfillment service request", {
+    return logger3.debug("Found a session for the fulfillment service request", {
       shop
     }), {
       session,
@@ -7467,8 +7467,8 @@ function authenticateFulfillmentServiceFactory(params) {
 }
 
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/future/flags.mjs
-function logDisabledFutureFlags2(config, logger2) {
-  let logFlag = (flag, message) => logger2.info(`Future flag ${flag} is disabled.
+function logDisabledFutureFlags2(config, logger3) {
+  let logFlag = (flag, message) => logger3.info(`Future flag ${flag} is disabled.
 
   ${message}
 `);
@@ -7478,9 +7478,9 @@ function logDisabledFutureFlags2(config, logger2) {
 
 // node_modules/@shopify/shopify-app-remix/dist/esm/server/shopify-app.mjs
 function shopifyApp(appConfig) {
-  let api = deriveApi(appConfig), config = deriveConfig(appConfig, api.config), logger2 = overrideLogger(api.logger);
+  let api = deriveApi(appConfig), config = deriveConfig(appConfig, api.config), logger3 = overrideLogger(api.logger);
   appConfig.webhooks && api.webhooks.addHandlers(appConfig.webhooks);
-  let params = { api, config, logger: logger2 }, authStrategy = authStrategyFactory({
+  let params = { api, config, logger: logger3 }, authStrategy = authStrategyFactory({
     ...params,
     strategy: config.future.unstable_newEmbeddedAuthStrategy && config.isEmbeddedApp ? new TokenExchangeStrategy(params) : new AuthCodeFlowStrategy(params)
   }), shopify2 = {
@@ -7499,7 +7499,7 @@ function shopifyApp(appConfig) {
       storefront: unauthenticatedStorefrontContextFactory(params)
     }
   };
-  return (isAppStoreApp(shopify2, appConfig) || isSingleMerchantApp(shopify2, appConfig)) && (shopify2.login = loginFactory(params)), logDisabledFutureFlags2(config, logger2), shopify2;
+  return (isAppStoreApp(shopify2, appConfig) || isSingleMerchantApp(shopify2, appConfig)) && (shopify2.login = loginFactory(params)), logDisabledFutureFlags2(config, logger3), shopify2;
 }
 function isAppStoreApp(_shopify, config) {
   return config.distribution === AppDistribution.AppStore;
@@ -7573,7 +7573,6 @@ var import_shopify_api16 = __toESM(require_lib()), import_shopify_app_session_st
   appUrl: process.env.SHOPIFY_APP_URL || "",
   authPathPrefix: "/auth",
   sessionStorage: new import_shopify_app_session_storage_memory.MemorySessionStorage(),
-  distribution: "app",
   isEmbedded: !0,
   webhooks: {
     APP_UNINSTALLED: {
@@ -7582,12 +7581,109 @@ var import_shopify_api16 = __toESM(require_lib()), import_shopify_app_session_st
     }
   },
   hooks: {
-    afterAuth: async (session) => {
+    afterAuth: async ({ session }) => {
       shopify.registerWebhooks({ session });
     }
   }
 });
 var authenticate = shopify.authenticate;
+
+// app/utils/logger.ts
+var Logger = class {
+  constructor() {
+    this.logs = [];
+    this.maxLogs = 1e3;
+    // Maksimum log sayısı
+    this.errorThreshold = 10;
+  }
+  // Hata sayısı eşiği
+  addLog(level, message, context, source) {
+    let logEntry = {
+      id: this.generateId(),
+      timestamp: /* @__PURE__ */ new Date(),
+      level,
+      message,
+      context,
+      source
+    };
+    this.logs.unshift(logEntry), this.logs.length > this.maxLogs && (this.logs = this.logs.slice(0, this.maxLogs));
+    let logMessage = `[${logEntry.timestamp.toISOString()}] [${level}] ${message}`;
+    switch (level) {
+      case "ERROR" /* ERROR */:
+        console.error(logMessage, context || "");
+        break;
+      case "WARNING" /* WARNING */:
+        console.warn(logMessage, context || "");
+        break;
+      case "DEBUG" /* DEBUG */:
+        console.debug(logMessage, context || "");
+        break;
+      default:
+        console.log(logMessage, context || "");
+    }
+    this.checkErrorThreshold();
+  }
+  generateId() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  }
+  checkErrorThreshold() {
+    let recentErrors = this.logs.filter((log2) => log2.level === "ERROR" /* ERROR */).filter((log2) => Date.now() - log2.timestamp.getTime() < 36e5);
+    recentErrors.length >= this.errorThreshold && console.warn(`\u26A0\uFE0F ALARM: Son 1 saatte ${recentErrors.length} hata olu\u015Ftu!`);
+  }
+  info(message, context, source) {
+    this.addLog("INFO" /* INFO */, message, context, source);
+  }
+  warning(message, context, source) {
+    this.addLog("WARNING" /* WARNING */, message, context, source);
+  }
+  error(message, context, source) {
+    this.addLog("ERROR" /* ERROR */, message, context, source);
+  }
+  debug(message, context, source) {
+    this.addLog("DEBUG" /* DEBUG */, message, context, source);
+  }
+  // Log'ları getir
+  getLogs(level, limit) {
+    let filteredLogs = this.logs;
+    return level && (filteredLogs = filteredLogs.filter((log2) => log2.level === level)), limit && (filteredLogs = filteredLogs.slice(0, limit)), filteredLogs;
+  }
+  // Belirli bir zaman aralığındaki log'ları getir
+  getLogsByTimeRange(startTime, endTime, level) {
+    let filteredLogs = this.logs.filter(
+      (log2) => log2.timestamp >= startTime && log2.timestamp <= endTime
+    );
+    return level && (filteredLogs = filteredLogs.filter((log2) => log2.level === level)), filteredLogs;
+  }
+  // Log istatistiklerini getir
+  getStats() {
+    let now = /* @__PURE__ */ new Date(), oneHourAgo = new Date(now.getTime() - 60 * 60 * 1e3), oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1e3), lastHourLogs = this.logs.filter((log2) => log2.timestamp >= oneHourAgo), lastDayLogs = this.logs.filter((log2) => log2.timestamp >= oneDayAgo);
+    return {
+      total: this.logs.length,
+      lastHour: lastHourLogs.length,
+      lastDay: lastDayLogs.length,
+      byLevel: {
+        INFO: this.logs.filter((log2) => log2.level === "INFO" /* INFO */).length,
+        WARNING: this.logs.filter((log2) => log2.level === "WARNING" /* WARNING */).length,
+        ERROR: this.logs.filter((log2) => log2.level === "ERROR" /* ERROR */).length,
+        DEBUG: this.logs.filter((log2) => log2.level === "DEBUG" /* DEBUG */).length
+      },
+      lastHourByLevel: {
+        INFO: lastHourLogs.filter((log2) => log2.level === "INFO" /* INFO */).length,
+        WARNING: lastHourLogs.filter((log2) => log2.level === "WARNING" /* WARNING */).length,
+        ERROR: lastHourLogs.filter((log2) => log2.level === "ERROR" /* ERROR */).length,
+        DEBUG: lastHourLogs.filter((log2) => log2.level === "DEBUG" /* DEBUG */).length
+      }
+    };
+  }
+  // Log'ları temizle
+  clearLogs() {
+    this.logs = [];
+  }
+  // Belirli bir seviyedeki log'ları temizle
+  clearLogsByLevel(level) {
+    this.logs = this.logs.filter((log2) => log2.level !== level);
+  }
+}, logger2 = new Logger();
 
 // app/routes/api.create-product.ts
 var action = async ({ request: request2 }) => {
@@ -7601,86 +7697,99 @@ var action = async ({ request: request2 }) => {
         success: !1,
         error: "Gerekli bilgiler eksik"
       }, { status: 400 });
-    let productTitle = `\xC7er\xE7eve ${width}\xD7${height} - ${material.charAt(0).toUpperCase() + material.slice(1)}`, product = await admin.product.create({
-      title: productTitle,
-      body_html: `<p>\xD6zel boyutlu \xE7er\xE7eve: ${width}\xD7${height} cm, ${material} materyal</p>`,
-      vendor: "\xD6zel Sipari\u015F",
-      product_type: "\xC7er\xE7eve",
-      tags: ["ge\xE7ici", "\xF6zel-boyut", "dinamik-fiyat"],
-      status: "draft",
-      // Vitrinde görünmesin
-      variants: [
-        {
-          price: price.toString(),
-          inventory_quantity: 1,
-          inventory_management: "shopify",
-          option1: `${width}\xD7${height}`,
-          option2: material,
-          option3: "\xD6zel Boyut"
+    let productTitle = `\xC7er\xE7eve ${width}\xD7${height} - ${material.charAt(0).toUpperCase() + material.slice(1)}`, productData = await (await admin.rest.post({
+      path: "products",
+      data: {
+        product: {
+          title: productTitle,
+          body_html: `<p>\xD6zel boyutlu \xE7er\xE7eve: ${width}\xD7${height} cm, ${material} materyal</p>`,
+          vendor: "\xD6zel Sipari\u015F",
+          product_type: "\xC7er\xE7eve",
+          tags: ["ge\xE7ici", "\xF6zel-boyut", "dinamik-fiyat"],
+          status: "draft",
+          // Not visible in the store
+          variants: [
+            {
+              price: price.toString(),
+              inventory_quantity: 1,
+              inventory_management: "shopify",
+              option1: `${width}\xD7${height}`,
+              option2: material,
+              option3: "\xD6zel Boyut"
+            }
+          ],
+          options: [
+            { name: "Boyut" },
+            { name: "Materyal" },
+            { name: "Tip" }
+          ],
+          metafields: [
+            {
+              namespace: "custom",
+              key: "width",
+              value: width.toString(),
+              type: "number_integer"
+            },
+            {
+              namespace: "custom",
+              key: "height",
+              value: height.toString(),
+              type: "number_integer"
+            },
+            {
+              namespace: "custom",
+              key: "material",
+              value: material,
+              type: "single_line_text_field"
+            },
+            {
+              namespace: "custom",
+              key: "is_temporary",
+              value: "true",
+              type: "boolean"
+            },
+            {
+              namespace: "custom",
+              key: "created_at",
+              value: (/* @__PURE__ */ new Date()).toISOString(),
+              type: "date_time"
+            },
+            {
+              namespace: "custom",
+              key: "expires_at",
+              value: new Date(Date.now() + 2 * 60 * 60 * 1e3).toISOString(),
+              // 2 saat sonra
+              type: "date_time"
+            },
+            {
+              namespace: "custom",
+              key: "customer_email",
+              value: customerEmail || "",
+              type: "single_line_text_field"
+            }
+          ]
         }
-      ],
-      options: [
-        { name: "Boyut" },
-        { name: "Materyal" },
-        { name: "Tip" }
-      ],
-      metafields: [
-        {
-          namespace: "custom",
-          key: "width",
-          value: width.toString(),
-          type: "number_integer"
-        },
-        {
-          namespace: "custom",
-          key: "height",
-          value: height.toString(),
-          type: "number_integer"
-        },
-        {
-          namespace: "custom",
-          key: "material",
-          value: material,
-          type: "single_line_text_field"
-        },
-        {
-          namespace: "custom",
-          key: "is_temporary",
-          value: "true",
-          type: "boolean"
-        },
-        {
-          namespace: "custom",
-          key: "created_at",
-          value: (/* @__PURE__ */ new Date()).toISOString(),
-          type: "date_time"
-        },
-        {
-          namespace: "custom",
-          key: "expires_at",
-          value: new Date(Date.now() + 2 * 60 * 60 * 1e3).toISOString(),
-          // 2 saat sonra
-          type: "date_time"
-        },
-        {
-          namespace: "custom",
-          key: "customer_email",
-          value: customerEmail || "",
-          type: "single_line_text_field"
-        }
-      ]
-    });
-    if (!product.data?.product)
+      }
+    })).json();
+    if (!productData?.product)
       throw new Error("\xDCr\xFCn olu\u015Fturulamad\u0131");
-    let createdProduct = product.data.product, variantId = createdProduct.variants?.[0]?.id;
-    return console.log(`Ge\xE7ici \xFCr\xFCn olu\u015Fturuldu: ${createdProduct.id}, ${productTitle}, ${price}TL`), (0, import_node.json)({
+    let createdProduct = productData.product, variantId = createdProduct.variants?.[0]?.id;
+    return logger2.info(`Ge\xE7ici \xFCr\xFCn olu\u015Fturuldu: ${createdProduct.id}, ${productTitle}, ${price}TL`, {
+      productId: createdProduct.id,
+      productTitle,
+      price,
+      width,
+      height,
+      material,
+      customerEmail
+    }, "api.create-product"), (0, import_node.json)({
       success: !0,
       productId: createdProduct.id.toString(),
       variantId: variantId?.toString(),
       message: "Ge\xE7ici \xFCr\xFCn ba\u015Far\u0131yla olu\u015Fturuldu"
     });
   } catch (error) {
-    return console.error("\xDCr\xFCn olu\u015Fturma hatas\u0131:", error), (0, import_node.json)({
+    return logger2.error("\xDCr\xFCn olu\u015Fturma hatas\u0131", { error }, "api.create-product"), (0, import_node.json)({
       success: !1,
       error: "\xDCr\xFCn olu\u015Fturulurken bir hata olu\u015Ftu"
     }, { status: 500 });
@@ -7699,12 +7808,15 @@ var action2 = async ({ request: request2 }) => {
     let { admin } = await authenticate.admin(request2);
     if (request2.method !== "POST")
       return (0, import_node2.json)({ success: !1, error: "Method not allowed" }, { status: 405 });
-    let twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1e3), products = await admin.product.list({
-      limit: 250,
-      status: "draft",
-      tag: "ge\xE7ici"
-    }), deletedCount = 0, productsToDelete = [];
-    for (let product of products.data.products) {
+    let twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1e3), productsData = await (await admin.rest.get({
+      path: "products",
+      query: {
+        limit: "250",
+        status: "draft",
+        tag: "ge\xE7ici"
+      }
+    })).json(), deletedCount = 0, productsToDelete = [];
+    for (let product of productsData.products) {
       let expiresAtMetafield = product.metafields?.find(
         (meta2) => meta2.key === "expires_at"
       );
@@ -7712,17 +7824,19 @@ var action2 = async ({ request: request2 }) => {
     }
     for (let productId of productsToDelete)
       try {
-        await admin.product.delete(productId), deletedCount++, console.log(`Ge\xE7ici \xFCr\xFCn silindi: ${productId}`);
+        await admin.rest.delete({
+          path: `products/${productId}`
+        }), deletedCount++, logger2.info(`Ge\xE7ici \xFCr\xFCn silindi: ${productId}`, { productId }, "api.cleanup");
       } catch (deleteError) {
-        console.error(`\xDCr\xFCn silinirken hata: ${productId}`, deleteError);
+        logger2.error(`\xDCr\xFCn silinirken hata: ${productId}`, { productId, error: deleteError }, "api.cleanup");
       }
-    return console.log(`Temizlik tamamland\u0131: ${deletedCount} \xFCr\xFCn silindi`), (0, import_node2.json)({
+    return logger2.info(`Temizlik tamamland\u0131: ${deletedCount} \xFCr\xFCn silindi`, { deletedCount }, "api.cleanup"), (0, import_node2.json)({
       success: !0,
       deletedCount,
       message: `${deletedCount} ge\xE7ici \xFCr\xFCn ba\u015Far\u0131yla silindi`
     });
   } catch (error) {
-    return console.error("Temizlik hatas\u0131:", error), (0, import_node2.json)({
+    return logger2.error("Temizlik hatas\u0131", { error }, "api.cleanup"), (0, import_node2.json)({
       success: !1,
       deletedCount: 0,
       message: "Temizlik s\u0131ras\u0131nda hata olu\u015Ftu",
@@ -7731,11 +7845,14 @@ var action2 = async ({ request: request2 }) => {
   }
 }, loader = async ({ request: request2 }) => {
   try {
-    let { admin } = await authenticate.admin(request2), temporaryProducts = (await admin.product.list({
-      limit: 250,
-      status: "draft",
-      tag: "ge\xE7ici"
-    })).data.products.filter((product) => product.metafields?.find(
+    let { admin } = await authenticate.admin(request2), temporaryProducts = (await (await admin.rest.get({
+      path: "products",
+      query: {
+        limit: "250",
+        status: "draft",
+        tag: "ge\xE7ici"
+      }
+    })).json()).products.filter((product) => product.metafields?.find(
       (meta2) => meta2.key === "is_temporary"
     )?.value === "true");
     return (0, import_node2.json)({
@@ -7749,7 +7866,7 @@ var action2 = async ({ request: request2 }) => {
       }))
     });
   } catch (error) {
-    return console.error("\xDCr\xFCn listesi hatas\u0131:", error), (0, import_node2.json)({
+    return logger2.error("\xDCr\xFCn listesi hatas\u0131", { error }, "api.cleanup"), (0, import_node2.json)({
       success: !1,
       error: "\xDCr\xFCn listesi al\u0131n\u0131rken hata olu\u015Ftu"
     }, { status: 500 });
@@ -7827,9 +7944,16 @@ var PRICING_DATA = {
         dimensionRange
       }
     };
-    return console.log(`Fiyat hesapland\u0131: ${width}x${height} ${material} = ${totalPrice}TL`), (0, import_node3.json)(response);
+    return logger2.info(`Fiyat hesapland\u0131: ${width}x${height} ${material} = ${totalPrice}TL`, {
+      width,
+      height,
+      material,
+      totalPrice,
+      area,
+      dimensionRange
+    }, "api.pricing"), (0, import_node3.json)(response);
   } catch (error) {
-    return console.error("Fiyat hesaplama hatas\u0131:", error), (0, import_node3.json)({
+    return logger2.error("Price calculation error", { error }, "api.pricing"), (0, import_node3.json)({
       success: !1,
       price: 0,
       breakdown: {
@@ -7839,7 +7963,7 @@ var PRICING_DATA = {
         area: 0,
         dimensionRange: ""
       },
-      error: "Fiyat hesaplan\u0131rken bir hata olu\u015Ftu"
+      error: "An error occurred while calculating the price"
     }, { status: 500 });
   }
 };
@@ -7852,9 +7976,12 @@ __export(app_index_exports, {
 });
 var import_node4 = require("@remix-run/node"), import_react3 = require("@remix-run/react");
 var import_jsx_dev_runtime3 = require("react/jsx-dev-runtime"), loader2 = async ({ request: request2 }) => {
-  let { admin } = await authenticate.admin(request2), shop = await admin.shop.get();
-  return (0, import_node4.json)({
-    shop: shop.data.shop
+  let { admin } = await authenticate.admin(request2), shopData = await (await admin.rest.get({ path: "shop" })).json();
+  return logger2.info("Ana sayfa ziyaret edildi", {
+    shopName: shopData.shop.name,
+    timestamp: (/* @__PURE__ */ new Date()).toISOString()
+  }, "app._index"), (0, import_node4.json)({
+    shop: shopData.shop
   });
 };
 function Index() {
@@ -7862,7 +7989,7 @@ function Index() {
   return /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("div", { className: "min-h-screen bg-gray-50 py-8", children: /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("div", { className: "max-w-4xl mx-auto px-4", children: /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("div", { className: "bg-white rounded-lg shadow-lg p-8", children: [
     /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("h1", { className: "text-3xl font-bold text-gray-900 text-center mb-8", children: "Dinamik Fiyat Hesaplay\u0131c\u0131" }, void 0, !1, {
       fileName: "app/routes/app._index.tsx",
-      lineNumber: 23,
+      lineNumber: 32,
       columnNumber: 11
     }, this),
     /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("div", { className: "text-center mb-8", children: [
@@ -7870,191 +7997,240 @@ function Index() {
         "Ho\u015F geldiniz, ",
         /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("strong", { children: shop.name }, void 0, !1, {
           fileName: "app/routes/app._index.tsx",
-          lineNumber: 29,
+          lineNumber: 38,
           columnNumber: 29
         }, this),
         "!"
       ] }, void 0, !0, {
         fileName: "app/routes/app._index.tsx",
-        lineNumber: 28,
+        lineNumber: 37,
         columnNumber: 13
       }, this),
       /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("p", { className: "text-gray-500 mt-2", children: "Bu uygulama ile \xFCr\xFCnleriniz i\xE7in dinamik fiyat hesaplayabilir ve ge\xE7ici \xFCr\xFCnler olu\u015Fturabilirsiniz." }, void 0, !1, {
         fileName: "app/routes/app._index.tsx",
-        lineNumber: 31,
+        lineNumber: 40,
         columnNumber: 13
       }, this)
     ] }, void 0, !0, {
       fileName: "app/routes/app._index.tsx",
-      lineNumber: 27,
+      lineNumber: 36,
       columnNumber: 11
     }, this),
     /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("div", { className: "grid md:grid-cols-2 gap-8", children: [
       /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("div", { className: "bg-blue-50 p-6 rounded-lg", children: [
         /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("h3", { className: "text-xl font-semibold text-blue-900 mb-4", children: "\u{1F680} Uygulama \xD6zellikleri" }, void 0, !1, {
           fileName: "app/routes/app._index.tsx",
-          lineNumber: 40,
+          lineNumber: 49,
           columnNumber: 15
         }, this),
         /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("ul", { className: "space-y-2 text-blue-800", children: [
           /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("li", { children: "\u2022 Dinamik boyut bazl\u0131 fiyat hesaplama" }, void 0, !1, {
             fileName: "app/routes/app._index.tsx",
-            lineNumber: 44,
+            lineNumber: 53,
             columnNumber: 17
           }, this),
           /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("li", { children: "\u2022 Materyal se\xE7imi ve fiyatland\u0131rma" }, void 0, !1, {
             fileName: "app/routes/app._index.tsx",
-            lineNumber: 45,
+            lineNumber: 54,
             columnNumber: 17
           }, this),
           /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("li", { children: "\u2022 Otomatik ge\xE7ici \xFCr\xFCn olu\u015Fturma" }, void 0, !1, {
             fileName: "app/routes/app._index.tsx",
-            lineNumber: 46,
+            lineNumber: 55,
             columnNumber: 17
           }, this),
           /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("li", { children: "\u2022 2 saat sonra otomatik temizlik" }, void 0, !1, {
             fileName: "app/routes/app._index.tsx",
-            lineNumber: 47,
+            lineNumber: 56,
             columnNumber: 17
           }, this),
           /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("li", { children: "\u2022 Tema entegrasyonu" }, void 0, !1, {
             fileName: "app/routes/app._index.tsx",
-            lineNumber: 48,
+            lineNumber: 57,
             columnNumber: 17
           }, this)
         ] }, void 0, !0, {
           fileName: "app/routes/app._index.tsx",
-          lineNumber: 43,
+          lineNumber: 52,
           columnNumber: 15
         }, this)
       ] }, void 0, !0, {
         fileName: "app/routes/app._index.tsx",
-        lineNumber: 39,
+        lineNumber: 48,
         columnNumber: 13
       }, this),
       /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("div", { className: "bg-green-50 p-6 rounded-lg", children: [
         /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("h3", { className: "text-xl font-semibold text-green-900 mb-4", children: "\u{1F4CB} Kurulum Ad\u0131mlar\u0131" }, void 0, !1, {
           fileName: "app/routes/app._index.tsx",
-          lineNumber: 54,
+          lineNumber: 63,
           columnNumber: 15
         }, this),
         /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("ol", { className: "space-y-2 text-green-800 list-decimal list-inside", children: [
           /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("li", { children: "Tema d\xFCzenleyicisini a\xE7\u0131n" }, void 0, !1, {
             fileName: "app/routes/app._index.tsx",
-            lineNumber: 58,
+            lineNumber: 67,
             columnNumber: 17
           }, this),
           /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("li", { children: "\xDCr\xFCn \u015Fablonuna uygulama blo\u011Fu ekleyin" }, void 0, !1, {
             fileName: "app/routes/app._index.tsx",
-            lineNumber: 59,
+            lineNumber: 68,
             columnNumber: 17
           }, this),
           /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("li", { children: "Mevcut varyant se\xE7iciyi gizleyin" }, void 0, !1, {
             fileName: "app/routes/app._index.tsx",
-            lineNumber: 60,
+            lineNumber: 69,
             columnNumber: 17
           }, this),
           /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("li", { children: "Uygulamay\u0131 test edin" }, void 0, !1, {
             fileName: "app/routes/app._index.tsx",
-            lineNumber: 61,
+            lineNumber: 70,
             columnNumber: 17
           }, this)
         ] }, void 0, !0, {
           fileName: "app/routes/app._index.tsx",
-          lineNumber: 57,
+          lineNumber: 66,
           columnNumber: 15
         }, this)
       ] }, void 0, !0, {
         fileName: "app/routes/app._index.tsx",
-        lineNumber: 53,
+        lineNumber: 62,
         columnNumber: 13
       }, this)
     ] }, void 0, !0, {
       fileName: "app/routes/app._index.tsx",
-      lineNumber: 37,
+      lineNumber: 46,
       columnNumber: 11
     }, this),
     /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("div", { className: "mt-8 bg-yellow-50 p-6 rounded-lg", children: [
       /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("h3", { className: "text-xl font-semibold text-yellow-900 mb-4", children: "\u26A1 H\u0131zl\u0131 Ba\u015Flang\u0131\xE7" }, void 0, !1, {
         fileName: "app/routes/app._index.tsx",
-        lineNumber: 68,
+        lineNumber: 77,
         columnNumber: 13
       }, this),
       /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("div", { className: "grid md:grid-cols-3 gap-4 text-sm", children: [
         /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("div", { className: "text-center", children: [
           /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("div", { className: "bg-yellow-200 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2", children: /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("span", { className: "text-yellow-800 font-bold", children: "1" }, void 0, !1, {
             fileName: "app/routes/app._index.tsx",
-            lineNumber: 74,
+            lineNumber: 83,
             columnNumber: 19
           }, this) }, void 0, !1, {
             fileName: "app/routes/app._index.tsx",
-            lineNumber: 73,
+            lineNumber: 82,
             columnNumber: 17
           }, this),
           /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("p", { className: "text-yellow-800", children: "Tema d\xFCzenleyicisini a\xE7\u0131n" }, void 0, !1, {
             fileName: "app/routes/app._index.tsx",
-            lineNumber: 76,
+            lineNumber: 85,
             columnNumber: 17
           }, this)
         ] }, void 0, !0, {
           fileName: "app/routes/app._index.tsx",
-          lineNumber: 72,
+          lineNumber: 81,
           columnNumber: 15
         }, this),
         /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("div", { className: "text-center", children: [
           /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("div", { className: "bg-yellow-200 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2", children: /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("span", { className: "text-yellow-800 font-bold", children: "2" }, void 0, !1, {
             fileName: "app/routes/app._index.tsx",
-            lineNumber: 80,
+            lineNumber: 89,
             columnNumber: 19
           }, this) }, void 0, !1, {
             fileName: "app/routes/app._index.tsx",
-            lineNumber: 79,
+            lineNumber: 88,
             columnNumber: 17
           }, this),
           /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("p", { className: "text-yellow-800", children: "Uygulama blo\u011Funu ekleyin" }, void 0, !1, {
             fileName: "app/routes/app._index.tsx",
-            lineNumber: 82,
+            lineNumber: 91,
             columnNumber: 17
           }, this)
         ] }, void 0, !0, {
           fileName: "app/routes/app._index.tsx",
-          lineNumber: 78,
+          lineNumber: 87,
           columnNumber: 15
         }, this),
         /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("div", { className: "text-center", children: [
           /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("div", { className: "bg-yellow-200 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2", children: /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("span", { className: "text-yellow-800 font-bold", children: "3" }, void 0, !1, {
             fileName: "app/routes/app._index.tsx",
-            lineNumber: 86,
+            lineNumber: 95,
             columnNumber: 19
           }, this) }, void 0, !1, {
             fileName: "app/routes/app._index.tsx",
-            lineNumber: 85,
+            lineNumber: 94,
             columnNumber: 17
           }, this),
           /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("p", { className: "text-yellow-800", children: "Test edin ve kullan\u0131n" }, void 0, !1, {
             fileName: "app/routes/app._index.tsx",
-            lineNumber: 88,
+            lineNumber: 97,
             columnNumber: 17
           }, this)
         ] }, void 0, !0, {
           fileName: "app/routes/app._index.tsx",
-          lineNumber: 84,
+          lineNumber: 93,
           columnNumber: 15
         }, this)
       ] }, void 0, !0, {
         fileName: "app/routes/app._index.tsx",
-        lineNumber: 71,
+        lineNumber: 80,
         columnNumber: 13
       }, this)
     ] }, void 0, !0, {
       fileName: "app/routes/app._index.tsx",
-      lineNumber: 67,
+      lineNumber: 76,
+      columnNumber: 11
+    }, this),
+    /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("div", { className: "mt-8 bg-purple-50 p-6 rounded-lg", children: [
+      /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("h3", { className: "text-xl font-semibold text-purple-900 mb-4", children: "\u{1F6E0}\uFE0F Y\xF6netim Ara\xE7lar\u0131" }, void 0, !1, {
+        fileName: "app/routes/app._index.tsx",
+        lineNumber: 104,
+        columnNumber: 13
+      }, this),
+      /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("div", { className: "grid md:grid-cols-2 gap-4", children: [
+        /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(
+          "a",
+          {
+            href: "/app/logs",
+            className: "bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors text-center",
+            children: "\u{1F4CA} Sistem Loglar\u0131"
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/routes/app._index.tsx",
+            lineNumber: 108,
+            columnNumber: 15
+          },
+          this
+        ),
+        /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)(
+          "a",
+          {
+            href: "/api/cleanup",
+            className: "bg-orange-600 text-white px-4 py-3 rounded-lg hover:bg-orange-700 transition-colors text-center",
+            children: "\u{1F9F9} Manuel Temizlik"
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/routes/app._index.tsx",
+            lineNumber: 114,
+            columnNumber: 15
+          },
+          this
+        )
+      ] }, void 0, !0, {
+        fileName: "app/routes/app._index.tsx",
+        lineNumber: 107,
+        columnNumber: 13
+      }, this)
+    ] }, void 0, !0, {
+      fileName: "app/routes/app._index.tsx",
+      lineNumber: 103,
       columnNumber: 11
     }, this),
     /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("div", { className: "mt-8 text-center", children: [
       /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("p", { className: "text-gray-600", children: "Herhangi bir sorun ya\u015Farsan\u0131z, l\xFCtfen destek ekibimizle ileti\u015Fime ge\xE7in." }, void 0, !1, {
         fileName: "app/routes/app._index.tsx",
-        lineNumber: 95,
+        lineNumber: 125,
         columnNumber: 13
       }, this),
       /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("p", { className: "text-sm text-gray-500 mt-2", children: [
@@ -8062,25 +8238,657 @@ function Index() {
         (/* @__PURE__ */ new Date()).toLocaleDateString("tr-TR")
       ] }, void 0, !0, {
         fileName: "app/routes/app._index.tsx",
-        lineNumber: 98,
+        lineNumber: 128,
         columnNumber: 13
       }, this)
     ] }, void 0, !0, {
       fileName: "app/routes/app._index.tsx",
-      lineNumber: 94,
+      lineNumber: 124,
       columnNumber: 11
     }, this)
   ] }, void 0, !0, {
     fileName: "app/routes/app._index.tsx",
-    lineNumber: 22,
+    lineNumber: 31,
     columnNumber: 9
   }, this) }, void 0, !1, {
     fileName: "app/routes/app._index.tsx",
-    lineNumber: 21,
+    lineNumber: 30,
     columnNumber: 7
   }, this) }, void 0, !1, {
     fileName: "app/routes/app._index.tsx",
-    lineNumber: 20,
+    lineNumber: 29,
+    columnNumber: 5
+  }, this);
+}
+
+// app/routes/api.logs.ts
+var api_logs_exports = {};
+__export(api_logs_exports, {
+  action: () => action4,
+  loader: () => loader3
+});
+var import_node5 = require("@remix-run/node");
+var loader3 = async ({ request: request2 }) => {
+  try {
+    let { admin } = await authenticate.admin(request2), url = new URL(request2.url), level = url.searchParams.get("level"), limit = parseInt(url.searchParams.get("limit") || "100"), source = url.searchParams.get("source"), startDate = url.searchParams.get("startDate"), endDate = url.searchParams.get("endDate"), logs = logger2.getLogs(level, limit);
+    if (startDate && endDate) {
+      let start = new Date(startDate), end = new Date(endDate);
+      logs = logger2.getLogsByTimeRange(start, end, level);
+    }
+    source && (logs = logs.filter((log2) => log2.source === source));
+    let stats = logger2.getStats();
+    return (0, import_node5.json)({
+      success: !0,
+      logs: logs.map((log2) => ({
+        ...log2,
+        timestamp: log2.timestamp.toISOString()
+      })),
+      stats
+    });
+  } catch (error) {
+    return logger2.error("Log listesi al\u0131n\u0131rken hata olu\u015Ftu", { error }, "api.logs"), (0, import_node5.json)({
+      success: !1,
+      error: "Log listesi al\u0131n\u0131rken hata olu\u015Ftu"
+    }, { status: 500 });
+  }
+}, action4 = async ({ request: request2 }) => {
+  try {
+    let { admin } = await authenticate.admin(request2);
+    if (request2.method !== "POST")
+      return (0, import_node5.json)({ success: !1, error: "Method not allowed" }, { status: 405 });
+    let formData = await request2.formData();
+    switch (formData.get("action")) {
+      case "clear":
+        let level = formData.get("level");
+        return level ? logger2.clearLogsByLevel(level) : logger2.clearLogs(), (0, import_node5.json)({
+          success: !0,
+          message: level ? `${level} seviyesindeki loglar temizlendi` : "T\xFCm loglar temizlendi"
+        });
+      case "export":
+        let logs = logger2.getLogs(), csvContent = generateCSV(logs);
+        return new Response(csvContent, {
+          headers: {
+            "Content-Type": "text/csv",
+            "Content-Disposition": 'attachment; filename="logs.csv"'
+          }
+        });
+      default:
+        return (0, import_node5.json)({
+          success: !1,
+          error: "Ge\xE7ersiz i\u015Flem"
+        }, { status: 400 });
+    }
+  } catch (error) {
+    return logger2.error("Log i\u015Flemi s\u0131ras\u0131nda hata olu\u015Ftu", { error }, "api.logs"), (0, import_node5.json)({
+      success: !1,
+      error: "Log i\u015Flemi s\u0131ras\u0131nda hata olu\u015Ftu"
+    }, { status: 500 });
+  }
+};
+function generateCSV(logs) {
+  let headers = ["ID", "Timestamp", "Level", "Message", "Source", "Context"], rows = logs.map((log2) => [
+    log2.id,
+    log2.timestamp.toISOString(),
+    log2.level,
+    log2.message,
+    log2.source || "",
+    log2.context ? JSON.stringify(log2.context) : ""
+  ]);
+  return [headers.join(","), ...rows.map(
+    (row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")
+  )].join(`
+`);
+}
+
+// app/routes/app.logs.tsx
+var app_logs_exports = {};
+__export(app_logs_exports, {
+  default: () => LogsPage,
+  loader: () => loader4
+});
+var import_react4 = require("react"), import_node6 = require("@remix-run/node"), import_react5 = require("@remix-run/react");
+var import_jsx_dev_runtime4 = require("react/jsx-dev-runtime"), loader4 = async ({ request: request2 }) => {
+  let { admin } = await authenticate.admin(request2);
+  return (0, import_node6.json)({ logs: [], stats: {} });
+};
+function LogsPage() {
+  let [logs, setLogs] = (0, import_react4.useState)([]), [stats, setStats] = (0, import_react4.useState)(null), [loading, setLoading] = (0, import_react4.useState)(!0), [filters, setFilters] = (0, import_react4.useState)({
+    level: "",
+    source: "",
+    startDate: "",
+    endDate: "",
+    limit: "100"
+  }), submit = (0, import_react5.useSubmit)();
+  (0, import_react4.useEffect)(() => {
+    loadLogs();
+  }, [filters]);
+  let loadLogs = async () => {
+    setLoading(!0);
+    try {
+      let params = new URLSearchParams();
+      filters.level && params.append("level", filters.level), filters.source && params.append("source", filters.source), filters.startDate && params.append("startDate", filters.startDate), filters.endDate && params.append("endDate", filters.endDate), filters.limit && params.append("limit", filters.limit);
+      let data = await (await fetch(`/api/logs?${params.toString()}`)).json();
+      data.success && (setLogs(data.logs || []), setStats(data.stats));
+    } catch (error) {
+      console.error("Loglar y\xFCklenirken hata:", error);
+    } finally {
+      setLoading(!1);
+    }
+  }, handleClearLogs = (level) => {
+    let formData = new FormData();
+    formData.append("action", "clear"), level && formData.append("level", level), submit(formData, { method: "post", action: "/api/logs" });
+  }, handleExportLogs = () => {
+    let formData = new FormData();
+    formData.append("action", "export"), submit(formData, { method: "post", action: "/api/logs" });
+  }, getLevelColor = (level) => {
+    switch (level) {
+      case "ERROR" /* ERROR */:
+        return "bg-red-100 text-red-800";
+      case "WARNING" /* WARNING */:
+        return "bg-yellow-100 text-yellow-800";
+      case "INFO" /* INFO */:
+        return "bg-blue-100 text-blue-800";
+      case "DEBUG" /* DEBUG */:
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  }, formatTimestamp = (timestamp) => new Date(timestamp).toLocaleString("tr-TR");
+  return /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "p-6 max-w-7xl mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "mb-8", children: [
+      /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("h1", { className: "text-3xl font-bold text-gray-900 mb-2", children: "Sistem Loglar\u0131" }, void 0, !1, {
+        fileName: "app/routes/app.logs.tsx",
+        lineNumber: 108,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("p", { className: "text-gray-600", children: "Uygulama aktivitelerini ve hatalar\u0131n\u0131 takip edin" }, void 0, !1, {
+        fileName: "app/routes/app.logs.tsx",
+        lineNumber: 109,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, !0, {
+      fileName: "app/routes/app.logs.tsx",
+      lineNumber: 107,
+      columnNumber: 7
+    }, this),
+    stats && /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "grid grid-cols-1 md:grid-cols-4 gap-4 mb-6", children: [
+      /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "bg-white p-4 rounded-lg shadow", children: [
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("h3", { className: "text-sm font-medium text-gray-500", children: "Toplam Log" }, void 0, !1, {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 116,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("p", { className: "text-2xl font-bold text-gray-900", children: stats.total }, void 0, !1, {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 117,
+          columnNumber: 13
+        }, this)
+      ] }, void 0, !0, {
+        fileName: "app/routes/app.logs.tsx",
+        lineNumber: 115,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "bg-white p-4 rounded-lg shadow", children: [
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("h3", { className: "text-sm font-medium text-gray-500", children: "Son 1 Saat" }, void 0, !1, {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 120,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("p", { className: "text-2xl font-bold text-blue-600", children: stats.lastHour }, void 0, !1, {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 121,
+          columnNumber: 13
+        }, this)
+      ] }, void 0, !0, {
+        fileName: "app/routes/app.logs.tsx",
+        lineNumber: 119,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "bg-white p-4 rounded-lg shadow", children: [
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("h3", { className: "text-sm font-medium text-gray-500", children: "Son 24 Saat" }, void 0, !1, {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 124,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("p", { className: "text-2xl font-bold text-green-600", children: stats.lastDay }, void 0, !1, {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 125,
+          columnNumber: 13
+        }, this)
+      ] }, void 0, !0, {
+        fileName: "app/routes/app.logs.tsx",
+        lineNumber: 123,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "bg-white p-4 rounded-lg shadow", children: [
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("h3", { className: "text-sm font-medium text-gray-500", children: "Hata Say\u0131s\u0131" }, void 0, !1, {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 128,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("p", { className: "text-2xl font-bold text-red-600", children: stats.byLevel?.ERROR || 0 }, void 0, !1, {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 129,
+          columnNumber: 13
+        }, this)
+      ] }, void 0, !0, {
+        fileName: "app/routes/app.logs.tsx",
+        lineNumber: 127,
+        columnNumber: 11
+      }, this)
+    ] }, void 0, !0, {
+      fileName: "app/routes/app.logs.tsx",
+      lineNumber: 114,
+      columnNumber: 9
+    }, this),
+    /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "bg-white p-4 rounded-lg shadow mb-6", children: /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "grid grid-cols-1 md:grid-cols-5 gap-4", children: [
+      /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("label", { className: "block text-sm font-medium text-gray-700 mb-1", children: "Log Seviyesi" }, void 0, !1, {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 138,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)(
+          "select",
+          {
+            value: filters.level,
+            onChange: (e) => setFilters({ ...filters, level: e.target.value }),
+            className: "w-full border border-gray-300 rounded-md px-3 py-2",
+            children: [
+              /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("option", { value: "", children: "T\xFCm\xFC" }, void 0, !1, {
+                fileName: "app/routes/app.logs.tsx",
+                lineNumber: 144,
+                columnNumber: 15
+              }, this),
+              /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("option", { value: "INFO" /* INFO */, children: "INFO" }, void 0, !1, {
+                fileName: "app/routes/app.logs.tsx",
+                lineNumber: 145,
+                columnNumber: 15
+              }, this),
+              /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("option", { value: "WARNING" /* WARNING */, children: "WARNING" }, void 0, !1, {
+                fileName: "app/routes/app.logs.tsx",
+                lineNumber: 146,
+                columnNumber: 15
+              }, this),
+              /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("option", { value: "ERROR" /* ERROR */, children: "ERROR" }, void 0, !1, {
+                fileName: "app/routes/app.logs.tsx",
+                lineNumber: 147,
+                columnNumber: 15
+              }, this),
+              /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("option", { value: "DEBUG" /* DEBUG */, children: "DEBUG" }, void 0, !1, {
+                fileName: "app/routes/app.logs.tsx",
+                lineNumber: 148,
+                columnNumber: 15
+              }, this)
+            ]
+          },
+          void 0,
+          !0,
+          {
+            fileName: "app/routes/app.logs.tsx",
+            lineNumber: 139,
+            columnNumber: 13
+          },
+          this
+        )
+      ] }, void 0, !0, {
+        fileName: "app/routes/app.logs.tsx",
+        lineNumber: 137,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("label", { className: "block text-sm font-medium text-gray-700 mb-1", children: "Kaynak" }, void 0, !1, {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 153,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)(
+          "input",
+          {
+            type: "text",
+            value: filters.source,
+            onChange: (e) => setFilters({ ...filters, source: e.target.value }),
+            placeholder: "API endpoint",
+            className: "w-full border border-gray-300 rounded-md px-3 py-2"
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/routes/app.logs.tsx",
+            lineNumber: 154,
+            columnNumber: 13
+          },
+          this
+        )
+      ] }, void 0, !0, {
+        fileName: "app/routes/app.logs.tsx",
+        lineNumber: 152,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("label", { className: "block text-sm font-medium text-gray-700 mb-1", children: "Ba\u015Flang\u0131\xE7 Tarihi" }, void 0, !1, {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 164,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)(
+          "input",
+          {
+            type: "datetime-local",
+            value: filters.startDate,
+            onChange: (e) => setFilters({ ...filters, startDate: e.target.value }),
+            className: "w-full border border-gray-300 rounded-md px-3 py-2"
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/routes/app.logs.tsx",
+            lineNumber: 165,
+            columnNumber: 13
+          },
+          this
+        )
+      ] }, void 0, !0, {
+        fileName: "app/routes/app.logs.tsx",
+        lineNumber: 163,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("label", { className: "block text-sm font-medium text-gray-700 mb-1", children: "Biti\u015F Tarihi" }, void 0, !1, {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 174,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)(
+          "input",
+          {
+            type: "datetime-local",
+            value: filters.endDate,
+            onChange: (e) => setFilters({ ...filters, endDate: e.target.value }),
+            className: "w-full border border-gray-300 rounded-md px-3 py-2"
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/routes/app.logs.tsx",
+            lineNumber: 175,
+            columnNumber: 13
+          },
+          this
+        )
+      ] }, void 0, !0, {
+        fileName: "app/routes/app.logs.tsx",
+        lineNumber: 173,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("label", { className: "block text-sm font-medium text-gray-700 mb-1", children: "Limit" }, void 0, !1, {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 184,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)(
+          "select",
+          {
+            value: filters.limit,
+            onChange: (e) => setFilters({ ...filters, limit: e.target.value }),
+            className: "w-full border border-gray-300 rounded-md px-3 py-2",
+            children: [
+              /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("option", { value: "50", children: "50" }, void 0, !1, {
+                fileName: "app/routes/app.logs.tsx",
+                lineNumber: 190,
+                columnNumber: 15
+              }, this),
+              /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("option", { value: "100", children: "100" }, void 0, !1, {
+                fileName: "app/routes/app.logs.tsx",
+                lineNumber: 191,
+                columnNumber: 15
+              }, this),
+              /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("option", { value: "250", children: "250" }, void 0, !1, {
+                fileName: "app/routes/app.logs.tsx",
+                lineNumber: 192,
+                columnNumber: 15
+              }, this),
+              /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("option", { value: "500", children: "500" }, void 0, !1, {
+                fileName: "app/routes/app.logs.tsx",
+                lineNumber: 193,
+                columnNumber: 15
+              }, this)
+            ]
+          },
+          void 0,
+          !0,
+          {
+            fileName: "app/routes/app.logs.tsx",
+            lineNumber: 185,
+            columnNumber: 13
+          },
+          this
+        )
+      ] }, void 0, !0, {
+        fileName: "app/routes/app.logs.tsx",
+        lineNumber: 183,
+        columnNumber: 11
+      }, this)
+    ] }, void 0, !0, {
+      fileName: "app/routes/app.logs.tsx",
+      lineNumber: 136,
+      columnNumber: 9
+    }, this) }, void 0, !1, {
+      fileName: "app/routes/app.logs.tsx",
+      lineNumber: 135,
+      columnNumber: 7
+    }, this),
+    /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "flex flex-wrap gap-2 mb-6", children: [
+      /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)(
+        "button",
+        {
+          onClick: () => handleClearLogs(),
+          className: "bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700",
+          children: "T\xFCm Loglar\u0131 Temizle"
+        },
+        void 0,
+        !1,
+        {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 201,
+          columnNumber: 9
+        },
+        this
+      ),
+      /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)(
+        "button",
+        {
+          onClick: () => handleClearLogs("ERROR" /* ERROR */),
+          className: "bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700",
+          children: "Sadece Hatalar\u0131 Temizle"
+        },
+        void 0,
+        !1,
+        {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 208,
+          columnNumber: 9
+        },
+        this
+      ),
+      /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)(
+        "button",
+        {
+          onClick: handleExportLogs,
+          className: "bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700",
+          children: "CSV Olarak \u0130ndir"
+        },
+        void 0,
+        !1,
+        {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 215,
+          columnNumber: 9
+        },
+        this
+      ),
+      /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)(
+        "button",
+        {
+          onClick: loadLogs,
+          className: "bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700",
+          children: "Yenile"
+        },
+        void 0,
+        !1,
+        {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 222,
+          columnNumber: 9
+        },
+        this
+      )
+    ] }, void 0, !0, {
+      fileName: "app/routes/app.logs.tsx",
+      lineNumber: 200,
+      columnNumber: 7
+    }, this),
+    /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "bg-white rounded-lg shadow overflow-hidden", children: [
+      /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "px-6 py-4 border-b border-gray-200", children: /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("h3", { className: "text-lg font-medium text-gray-900", children: [
+        "Log Kay\u0131tlar\u0131 (",
+        logs.length,
+        ")"
+      ] }, void 0, !0, {
+        fileName: "app/routes/app.logs.tsx",
+        lineNumber: 233,
+        columnNumber: 11
+      }, this) }, void 0, !1, {
+        fileName: "app/routes/app.logs.tsx",
+        lineNumber: 232,
+        columnNumber: 9
+      }, this),
+      loading ? /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "p-6 text-center", children: [
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto" }, void 0, !1, {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 240,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("p", { className: "mt-2 text-gray-600", children: "Loglar y\xFCkleniyor..." }, void 0, !1, {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 241,
+          columnNumber: 13
+        }, this)
+      ] }, void 0, !0, {
+        fileName: "app/routes/app.logs.tsx",
+        lineNumber: 239,
+        columnNumber: 11
+      }, this) : logs.length === 0 ? /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "p-6 text-center text-gray-500", children: "Log kayd\u0131 bulunamad\u0131" }, void 0, !1, {
+        fileName: "app/routes/app.logs.tsx",
+        lineNumber: 244,
+        columnNumber: 11
+      }, this) : /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "overflow-x-auto", children: /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("table", { className: "min-w-full divide-y divide-gray-200", children: [
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("thead", { className: "bg-gray-50", children: /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("tr", { children: [
+          /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("th", { className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider", children: "Zaman" }, void 0, !1, {
+            fileName: "app/routes/app.logs.tsx",
+            lineNumber: 252,
+            columnNumber: 19
+          }, this),
+          /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("th", { className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider", children: "Seviye" }, void 0, !1, {
+            fileName: "app/routes/app.logs.tsx",
+            lineNumber: 255,
+            columnNumber: 19
+          }, this),
+          /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("th", { className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider", children: "Mesaj" }, void 0, !1, {
+            fileName: "app/routes/app.logs.tsx",
+            lineNumber: 258,
+            columnNumber: 19
+          }, this),
+          /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("th", { className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider", children: "Kaynak" }, void 0, !1, {
+            fileName: "app/routes/app.logs.tsx",
+            lineNumber: 261,
+            columnNumber: 19
+          }, this),
+          /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("th", { className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider", children: "Detay" }, void 0, !1, {
+            fileName: "app/routes/app.logs.tsx",
+            lineNumber: 264,
+            columnNumber: 19
+          }, this)
+        ] }, void 0, !0, {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 251,
+          columnNumber: 17
+        }, this) }, void 0, !1, {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 250,
+          columnNumber: 15
+        }, this),
+        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("tbody", { className: "bg-white divide-y divide-gray-200", children: logs.map((log2) => /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("tr", { className: "hover:bg-gray-50", children: [
+          /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("td", { className: "px-6 py-4 whitespace-nowrap text-sm text-gray-900", children: formatTimestamp(log2.timestamp) }, void 0, !1, {
+            fileName: "app/routes/app.logs.tsx",
+            lineNumber: 272,
+            columnNumber: 21
+          }, this),
+          /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("td", { className: "px-6 py-4 whitespace-nowrap", children: /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("span", { className: `inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getLevelColor(log2.level)}`, children: log2.level }, void 0, !1, {
+            fileName: "app/routes/app.logs.tsx",
+            lineNumber: 276,
+            columnNumber: 23
+          }, this) }, void 0, !1, {
+            fileName: "app/routes/app.logs.tsx",
+            lineNumber: 275,
+            columnNumber: 21
+          }, this),
+          /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("td", { className: "px-6 py-4 text-sm text-gray-900 max-w-md truncate", children: log2.message }, void 0, !1, {
+            fileName: "app/routes/app.logs.tsx",
+            lineNumber: 280,
+            columnNumber: 21
+          }, this),
+          /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("td", { className: "px-6 py-4 whitespace-nowrap text-sm text-gray-500", children: log2.source || "-" }, void 0, !1, {
+            fileName: "app/routes/app.logs.tsx",
+            lineNumber: 283,
+            columnNumber: 21
+          }, this),
+          /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("td", { className: "px-6 py-4 whitespace-nowrap text-sm text-gray-500", children: log2.context ? /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("details", { className: "cursor-pointer", children: [
+            /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("summary", { className: "text-blue-600 hover:text-blue-800", children: "Detaylar\u0131 G\xF6ster" }, void 0, !1, {
+              fileName: "app/routes/app.logs.tsx",
+              lineNumber: 289,
+              columnNumber: 27
+            }, this),
+            /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("pre", { className: "mt-2 text-xs bg-gray-100 p-2 rounded overflow-auto max-w-xs", children: JSON.stringify(log2.context, null, 2) }, void 0, !1, {
+              fileName: "app/routes/app.logs.tsx",
+              lineNumber: 292,
+              columnNumber: 27
+            }, this)
+          ] }, void 0, !0, {
+            fileName: "app/routes/app.logs.tsx",
+            lineNumber: 288,
+            columnNumber: 25
+          }, this) : "-" }, void 0, !1, {
+            fileName: "app/routes/app.logs.tsx",
+            lineNumber: 286,
+            columnNumber: 21
+          }, this)
+        ] }, log2.id, !0, {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 271,
+          columnNumber: 19
+        }, this)) }, void 0, !1, {
+          fileName: "app/routes/app.logs.tsx",
+          lineNumber: 269,
+          columnNumber: 15
+        }, this)
+      ] }, void 0, !0, {
+        fileName: "app/routes/app.logs.tsx",
+        lineNumber: 249,
+        columnNumber: 13
+      }, this) }, void 0, !1, {
+        fileName: "app/routes/app.logs.tsx",
+        lineNumber: 248,
+        columnNumber: 11
+      }, this)
+    ] }, void 0, !0, {
+      fileName: "app/routes/app.logs.tsx",
+      lineNumber: 231,
+      columnNumber: 7
+    }, this)
+  ] }, void 0, !0, {
+    fileName: "app/routes/app.logs.tsx",
+    lineNumber: 106,
     columnNumber: 5
   }, this);
 }
@@ -8091,12 +8899,12 @@ __export(index_exports, {
   default: () => Index2,
   meta: () => meta
 });
-var import_react4 = require("react"), import_jsx_dev_runtime4 = require("react/jsx-dev-runtime"), meta = () => [
+var import_react6 = require("react"), import_jsx_dev_runtime5 = require("react/jsx-dev-runtime"), meta = () => [
   { title: "Dinamik Fiyat Hesaplay\u0131c\u0131" },
   { name: "description", content: "Boy, en ve materyal se\xE7imine g\xF6re dinamik fiyat hesaplama" }
 ];
 function Index2() {
-  let [width, setWidth] = (0, import_react4.useState)(0), [height, setHeight] = (0, import_react4.useState)(0), [material, setMaterial] = (0, import_react4.useState)(""), [estimatedPrice, setEstimatedPrice] = (0, import_react4.useState)(null), [isLoading, setIsLoading] = (0, import_react4.useState)(!1), [error, setError] = (0, import_react4.useState)(""), pricingData = {
+  let [width, setWidth] = (0, import_react6.useState)(0), [height, setHeight] = (0, import_react6.useState)(0), [material, setMaterial] = (0, import_react6.useState)(""), [estimatedPrice, setEstimatedPrice] = (0, import_react6.useState)(null), [isLoading, setIsLoading] = (0, import_react6.useState)(!1), [error, setError] = (0, import_react6.useState)(""), pricingData = {
     dimensions: {
       "100-200": 1,
       "201-400": 1.5,
@@ -8120,7 +8928,7 @@ function Index2() {
     let calculatedPrice = (25 + (pricingData.materials[material.toLowerCase()] || 0)) * dimensionCoefficient;
     setEstimatedPrice(Math.round(calculatedPrice));
   };
-  (0, import_react4.useEffect)(() => {
+  (0, import_react6.useEffect)(() => {
     calculatePrice();
   }, [width, height, material]);
   let handleAddToCart = async () => {
@@ -8137,21 +8945,21 @@ function Index2() {
       setIsLoading(!1);
     }
   }, getDimensionRange = (area) => area <= 2e4 ? "100-200 cm\xB2" : area <= 8e4 ? "201-400 cm\xB2" : area <= 24e4 ? "401-600 cm\xB2" : area <= 48e4 ? "601-800 cm\xB2" : "801+ cm\xB2";
-  return /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "min-h-screen bg-gray-50 py-8", children: /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "max-w-2xl mx-auto px-4", children: /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "bg-white rounded-lg shadow-lg p-8", children: [
-    /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("h1", { className: "text-3xl font-bold text-gray-900 text-center mb-8", children: "Dinamik Fiyat Hesaplay\u0131c\u0131" }, void 0, !1, {
+  return /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("div", { className: "min-h-screen bg-gray-50 py-8", children: /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("div", { className: "max-w-2xl mx-auto px-4", children: /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("div", { className: "bg-white rounded-lg shadow-lg p-8", children: [
+    /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("h1", { className: "text-3xl font-bold text-gray-900 text-center mb-8", children: "Dinamik Fiyat Hesaplay\u0131c\u0131" }, void 0, !1, {
       fileName: "app/routes/_index.tsx",
-      lineNumber: 109,
+      lineNumber: 103,
       columnNumber: 11
     }, this),
-    /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "space-y-6", children: [
-      /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "grid grid-cols-2 gap-4", children: [
-        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("label", { className: "form-label", children: "Geni\u015Flik (cm)" }, void 0, !1, {
+    /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("div", { className: "space-y-6", children: [
+      /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("div", { className: "grid grid-cols-2 gap-4", children: [
+        /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("label", { className: "form-label", children: "Geni\u015Flik (cm)" }, void 0, !1, {
             fileName: "app/routes/_index.tsx",
-            lineNumber: 117,
+            lineNumber: 111,
             columnNumber: 17
           }, this),
-          /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)(
+          /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)(
             "input",
             {
               type: "number",
@@ -8166,23 +8974,23 @@ function Index2() {
             !1,
             {
               fileName: "app/routes/_index.tsx",
-              lineNumber: 118,
+              lineNumber: 112,
               columnNumber: 17
             },
             this
           )
         ] }, void 0, !0, {
           fileName: "app/routes/_index.tsx",
-          lineNumber: 116,
+          lineNumber: 110,
           columnNumber: 15
         }, this),
-        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("label", { className: "form-label", children: "Y\xFCkseklik (cm)" }, void 0, !1, {
+        /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("label", { className: "form-label", children: "Y\xFCkseklik (cm)" }, void 0, !1, {
             fileName: "app/routes/_index.tsx",
-            lineNumber: 129,
+            lineNumber: 123,
             columnNumber: 17
           }, this),
-          /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)(
+          /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)(
             "input",
             {
               type: "number",
@@ -8197,57 +9005,57 @@ function Index2() {
             !1,
             {
               fileName: "app/routes/_index.tsx",
-              lineNumber: 130,
+              lineNumber: 124,
               columnNumber: 17
             },
             this
           )
         ] }, void 0, !0, {
           fileName: "app/routes/_index.tsx",
-          lineNumber: 128,
+          lineNumber: 122,
           columnNumber: 15
         }, this)
       ] }, void 0, !0, {
         fileName: "app/routes/_index.tsx",
-        lineNumber: 115,
+        lineNumber: 109,
         columnNumber: 13
       }, this),
-      /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("label", { className: "form-label", children: "Materyal" }, void 0, !1, {
+      /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("label", { className: "form-label", children: "Materyal" }, void 0, !1, {
           fileName: "app/routes/_index.tsx",
-          lineNumber: 144,
+          lineNumber: 138,
           columnNumber: 15
         }, this),
-        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)(
+        /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)(
           "select",
           {
             value: material,
             onChange: (e) => setMaterial(e.target.value),
             className: "form-input",
             children: [
-              /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("option", { value: "", children: "Materyal se\xE7in" }, void 0, !1, {
+              /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("option", { value: "", children: "Materyal se\xE7in" }, void 0, !1, {
                 fileName: "app/routes/_index.tsx",
-                lineNumber: 150,
+                lineNumber: 144,
                 columnNumber: 17
               }, this),
-              /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("option", { value: "ah\u015Fap", children: "Ah\u015Fap" }, void 0, !1, {
+              /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("option", { value: "ah\u015Fap", children: "Ah\u015Fap" }, void 0, !1, {
                 fileName: "app/routes/_index.tsx",
-                lineNumber: 151,
+                lineNumber: 145,
                 columnNumber: 17
               }, this),
-              /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("option", { value: "cam", children: "Cam" }, void 0, !1, {
+              /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("option", { value: "cam", children: "Cam" }, void 0, !1, {
                 fileName: "app/routes/_index.tsx",
-                lineNumber: 152,
+                lineNumber: 146,
                 columnNumber: 17
               }, this),
-              /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("option", { value: "metal", children: "Metal" }, void 0, !1, {
+              /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("option", { value: "metal", children: "Metal" }, void 0, !1, {
                 fileName: "app/routes/_index.tsx",
-                lineNumber: 153,
+                lineNumber: 147,
                 columnNumber: 17
               }, this),
-              /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("option", { value: "plastik", children: "Plastik" }, void 0, !1, {
+              /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("option", { value: "plastik", children: "Plastik" }, void 0, !1, {
                 fileName: "app/routes/_index.tsx",
-                lineNumber: 154,
+                lineNumber: 148,
                 columnNumber: 17
               }, this)
             ]
@@ -8256,31 +9064,31 @@ function Index2() {
           !0,
           {
             fileName: "app/routes/_index.tsx",
-            lineNumber: 145,
+            lineNumber: 139,
             columnNumber: 15
           },
           this
         )
       ] }, void 0, !0, {
         fileName: "app/routes/_index.tsx",
-        lineNumber: 143,
+        lineNumber: 137,
         columnNumber: 13
       }, this),
-      estimatedPrice && /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "price-display text-center", children: [
-        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "text-sm text-gray-600 mb-2", children: "Tahmini Fiyat" }, void 0, !1, {
+      estimatedPrice && /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("div", { className: "price-display text-center", children: [
+        /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("div", { className: "text-sm text-gray-600 mb-2", children: "Tahmini Fiyat" }, void 0, !1, {
           fileName: "app/routes/_index.tsx",
-          lineNumber: 161,
+          lineNumber: 155,
           columnNumber: 17
         }, this),
-        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "text-4xl", children: [
+        /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("div", { className: "text-4xl", children: [
           estimatedPrice,
           " TL"
         ] }, void 0, !0, {
           fileName: "app/routes/_index.tsx",
-          lineNumber: 162,
+          lineNumber: 156,
           columnNumber: 17
         }, this),
-        width && height && /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "text-sm text-gray-500 mt-2", children: [
+        width && height && /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("div", { className: "text-sm text-gray-500 mt-2", children: [
           "Alan: ",
           width,
           " \xD7 ",
@@ -8292,20 +9100,20 @@ function Index2() {
           ")"
         ] }, void 0, !0, {
           fileName: "app/routes/_index.tsx",
-          lineNumber: 164,
+          lineNumber: 158,
           columnNumber: 19
         }, this)
       ] }, void 0, !0, {
         fileName: "app/routes/_index.tsx",
-        lineNumber: 160,
+        lineNumber: 154,
         columnNumber: 15
       }, this),
-      error && /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg", children: error }, void 0, !1, {
+      error && /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("div", { className: "bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg", children: error }, void 0, !1, {
         fileName: "app/routes/_index.tsx",
-        lineNumber: 174,
+        lineNumber: 168,
         columnNumber: 15
       }, this),
-      /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)(
+      /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)(
         "button",
         {
           onClick: handleAddToCart,
@@ -8317,49 +9125,49 @@ function Index2() {
         !1,
         {
           fileName: "app/routes/_index.tsx",
-          lineNumber: 180,
+          lineNumber: 174,
           columnNumber: 13
         },
         this
       ),
-      /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("div", { className: "text-sm text-gray-600 text-center", children: [
-        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("p", { children: "\u2022 Olu\u015Fturulan \xFCr\xFCnler 2 saat sonra otomatik olarak silinir" }, void 0, !1, {
+      /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("div", { className: "text-sm text-gray-600 text-center", children: [
+        /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("p", { children: "\u2022 Olu\u015Fturulan \xFCr\xFCnler 2 saat sonra otomatik olarak silinir" }, void 0, !1, {
           fileName: "app/routes/_index.tsx",
-          lineNumber: 194,
+          lineNumber: 188,
           columnNumber: 15
         }, this),
-        /* @__PURE__ */ (0, import_jsx_dev_runtime4.jsxDEV)("p", { children: "\u2022 Fiyatlar tahmini olup, nihai fiyat sipari\u015F s\u0131ras\u0131nda do\u011Frulan\u0131r" }, void 0, !1, {
+        /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("p", { children: "\u2022 Fiyatlar tahmini olup, nihai fiyat sipari\u015F s\u0131ras\u0131nda do\u011Frulan\u0131r" }, void 0, !1, {
           fileName: "app/routes/_index.tsx",
-          lineNumber: 195,
+          lineNumber: 189,
           columnNumber: 15
         }, this)
       ] }, void 0, !0, {
         fileName: "app/routes/_index.tsx",
-        lineNumber: 193,
+        lineNumber: 187,
         columnNumber: 13
       }, this)
     ] }, void 0, !0, {
       fileName: "app/routes/_index.tsx",
-      lineNumber: 113,
+      lineNumber: 107,
       columnNumber: 11
     }, this)
   ] }, void 0, !0, {
     fileName: "app/routes/_index.tsx",
-    lineNumber: 108,
+    lineNumber: 102,
     columnNumber: 9
   }, this) }, void 0, !1, {
     fileName: "app/routes/_index.tsx",
-    lineNumber: 107,
+    lineNumber: 101,
     columnNumber: 7
   }, this) }, void 0, !1, {
     fileName: "app/routes/_index.tsx",
-    lineNumber: 106,
+    lineNumber: 100,
     columnNumber: 5
   }, this);
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { entry: { module: "/build/entry.client-FXAUTCMC.js", imports: ["/build/_shared/chunk-O4BRYNJ4.js", "/build/_shared/chunk-OGE7FTCN.js", "/build/_shared/chunk-U4FRFQSK.js", "/build/_shared/chunk-HAMQ6OZS.js", "/build/_shared/chunk-UWV35TSL.js", "/build/_shared/chunk-XGOTYLZ5.js", "/build/_shared/chunk-7M6SC7J5.js", "/build/_shared/chunk-PNG5AS42.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-GGIR7472.js", imports: void 0, hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-WNH4SWW7.js", imports: void 0, hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.cleanup": { id: "routes/api.cleanup", parentId: "root", path: "api/cleanup", index: void 0, caseSensitive: void 0, module: "/build/routes/api.cleanup-7R4LVEWX.js", imports: void 0, hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.create-product": { id: "routes/api.create-product", parentId: "root", path: "api/create-product", index: void 0, caseSensitive: void 0, module: "/build/routes/api.create-product-VYHFLECT.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.pricing": { id: "routes/api.pricing", parentId: "root", path: "api/pricing", index: void 0, caseSensitive: void 0, module: "/build/routes/api.pricing-RUWRUNEF.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/app._index": { id: "routes/app._index", parentId: "root", path: "app", index: !0, caseSensitive: void 0, module: "/build/routes/app._index-2KO6TO6A.js", imports: void 0, hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "cc8c62ef", hmr: { runtime: "/build/_shared\\chunk-HAMQ6OZS.js", timestamp: 1756319565357 }, url: "/build/manifest-CC8C62EF.js" };
+var assets_manifest_default = { entry: { module: "/build/entry.client-KM7MBFTG.js", imports: ["/build/_shared/chunk-O4BRYNJ4.js", "/build/_shared/chunk-XGOTYLZ5.js", "/build/_shared/chunk-Q7GDBZEC.js", "/build/_shared/chunk-LMRCC5LY.js", "/build/_shared/chunk-UWV35TSL.js", "/build/_shared/chunk-U4FRFQSK.js", "/build/_shared/chunk-7M6SC7J5.js", "/build/_shared/chunk-PNG5AS42.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-UYB7YZXE.js", imports: void 0, hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-MCBVVYQ5.js", imports: void 0, hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.cleanup": { id: "routes/api.cleanup", parentId: "root", path: "api/cleanup", index: void 0, caseSensitive: void 0, module: "/build/routes/api.cleanup-7R4LVEWX.js", imports: void 0, hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.create-product": { id: "routes/api.create-product", parentId: "root", path: "api/create-product", index: void 0, caseSensitive: void 0, module: "/build/routes/api.create-product-VYHFLECT.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.logs": { id: "routes/api.logs", parentId: "root", path: "api/logs", index: void 0, caseSensitive: void 0, module: "/build/routes/api.logs-ISQDU7GC.js", imports: void 0, hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/api.pricing": { id: "routes/api.pricing", parentId: "root", path: "api/pricing", index: void 0, caseSensitive: void 0, module: "/build/routes/api.pricing-RUWRUNEF.js", imports: void 0, hasAction: !0, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/app._index": { id: "routes/app._index", parentId: "root", path: "app", index: !0, caseSensitive: void 0, module: "/build/routes/app._index-33Y5TWYL.js", imports: ["/build/_shared/chunk-X3IPFAUA.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/app.logs": { id: "routes/app.logs", parentId: "root", path: "app/logs", index: void 0, caseSensitive: void 0, module: "/build/routes/app.logs-RGU6GK7B.js", imports: ["/build/_shared/chunk-X3IPFAUA.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "8da8ff63", hmr: { runtime: "/build/_shared\\chunk-LMRCC5LY.js", timestamp: 1756445917785 }, url: "/build/manifest-8DA8FF63.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var mode = "development", assetsBuildDirectory = "public\\build", future = { v3_fetcherPersist: !1, v3_relativeSplatPath: !1, v3_throwAbortReason: !1, v3_routeConfig: !1, v3_singleFetch: !1, v3_lazyRouteDiscovery: !1, unstable_optimizeDeps: !1 }, publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
@@ -8402,6 +9210,22 @@ var mode = "development", assetsBuildDirectory = "public\\build", future = { v3_
     index: !0,
     caseSensitive: void 0,
     module: app_index_exports
+  },
+  "routes/api.logs": {
+    id: "routes/api.logs",
+    parentId: "root",
+    path: "api/logs",
+    index: void 0,
+    caseSensitive: void 0,
+    module: api_logs_exports
+  },
+  "routes/app.logs": {
+    id: "routes/app.logs",
+    parentId: "root",
+    path: "app/logs",
+    index: void 0,
+    caseSensitive: void 0,
+    module: app_logs_exports
   },
   "routes/_index": {
     id: "routes/_index",

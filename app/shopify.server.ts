@@ -17,7 +17,6 @@ const shopify = shopifyApp({
   appUrl: process.env.SHOPIFY_APP_URL || "",
   authPathPrefix: "/auth",
   sessionStorage: new MemorySessionStorage(),
-  distribution: "app",
   isEmbedded: true,
   webhooks: {
     APP_UNINSTALLED: {
@@ -26,7 +25,7 @@ const shopify = shopifyApp({
     },
   },
   hooks: {
-    afterAuth: async (session) => {
+    afterAuth: async ({ session }) => {
       // Auth sonrası işlemler
       shopify.registerWebhooks({ session });
     },
