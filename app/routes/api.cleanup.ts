@@ -47,14 +47,49 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       }
     }
 
-    // Ürünleri sil
+    // Ürünleri sil (siparişe girmiş olsa bile)
     for (const productId of productsToDelete) {
       try {
+        // Önce ürünün siparişlerde kullanılıp kullanılmadığını kontrol et
+        const orders = await admin.rest.get({
+          path: "orders",
+          query: {
+            limit: "250",
+            status: "any",
+            fields: "id,line_items"
+          }
+        });
+
+        const ordersData = await orders.json();
+        let isInOrder = false;
+        let orderIds: string[] = [];
+
+        // Siparişlerde bu ürün var mı kontrol et
+        for (const order of ordersData.orders) {
+          const hasProduct = order.line_items?.some((item: any) => 
+            item.product_id?.toString() === productId
+          );
+          if (hasProduct) {
+            isInOrder = true;
+            orderIds.push(order.id.toString());
+          }
+        }
+
+        // Siparişe girmiş olsa bile sil (sipariş kaydı etkilenmez)
         await admin.rest.delete({
           path: `products/${productId}`
         });
         deletedCount++;
-        logger.info(`Geçici ürün silindi: ${productId}`, { productId }, "api.cleanup");
+        
+        if (isInOrder) {
+          logger.info(`Siparişe girmiş geçici ürün silindi: ${productId}`, { 
+            productId, 
+            orderIds,
+            note: "Sipariş kayıtları etkilenmedi"
+          }, "api.cleanup");
+        } else {
+          logger.info(`Geçici ürün silindi: ${productId}`, { productId }, "api.cleanup");
+        }
       } catch (deleteError) {
         logger.error(`Ürün silinirken hata: ${productId}`, { productId, error: deleteError }, "api.cleanup");
       }

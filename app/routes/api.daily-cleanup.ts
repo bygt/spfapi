@@ -2,11 +2,11 @@ import { json, type ActionFunctionArgs } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
 import { logger } from "../utils/logger";
 
-interface SchedulerResponse {
+interface DailyCleanupResponse {
   success: boolean;
   deletedCount: number;
+  totalScanned: number;
   message: string;
-  nextRun?: string;
   error?: string;
 }
 
@@ -18,47 +18,42 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       return json({ success: false, error: "Method not allowed" }, { status: 405 });
     }
 
-    // Check API key (for security)
+    // Check API key for security
     const authHeader = request.headers.get("authorization");
-    if (authHeader !== `Bearer ${process.env.SCHEDULER_API_KEY || "default-key"}`) {
+    if (authHeader !== `Bearer ${process.env.DAILY_CLEANUP_API_KEY || "daily-cleanup-key"}`) {
       return json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    // Calculate 2 hours ago
-    const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
-    
-    // Find temporary products
+    // Get ALL temporary products (regardless of age)
     const products = await admin.rest.get({
       path: "products",
       query: {
         limit: "250",
-        status: "active",
-        tag: "temporary"
+        status: "any",
+        tag: "geçici"
       }
     });
 
     const productsData = await products.json();
     let deletedCount = 0;
+    let totalScanned = productsData.products.length;
     const productsToDelete: string[] = [];
 
-    // Filter expired products
+    // Find all temporary products (even if they should have been deleted earlier)
     for (const product of productsData.products) {
-      const expiresAtMetafield = product.metafields?.find(
-        (meta: any) => meta.key === "expires_at"
+      const isTemporaryMetafield = product.metafields?.find(
+        (meta: any) => meta.key === "is_temporary"
       );
-
-      if (expiresAtMetafield?.value) {
-        const expiresAt = new Date(expiresAtMetafield.value);
-        if (expiresAt < twoHoursAgo) {
-          productsToDelete.push(product.id.toString());
-        }
+      
+      if (isTemporaryMetafield?.value === "true") {
+        productsToDelete.push(product.id.toString());
       }
     }
 
-    // Delete products (even if they're in orders)
+    // Delete all temporary products found
     for (const productId of productsToDelete) {
       try {
-        // Check if product is in any orders
+        // Check if product is in any orders (for logging purposes)
         const orders = await admin.rest.get({
           path: "orders",
           query: {
@@ -72,7 +67,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         let isInOrder = false;
         let orderIds: string[] = [];
 
-        // Check if product is in orders
         for (const order of ordersData.orders) {
           const hasProduct = order.line_items?.some((item: any) => 
             item.product_id?.toString() === productId
@@ -83,66 +77,68 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           }
         }
 
-        // Delete even if in orders (order records won't be affected)
+        // Delete the product
         await admin.rest.delete({
           path: `products/${productId}`
         });
         deletedCount++;
         
         if (isInOrder) {
-          logger.info(`Product in orders deleted by scheduler: ${productId}`, { 
+          logger.info(`Daily cleanup: Product in orders deleted: ${productId}`, { 
             productId, 
             orderIds,
             note: "Order records not affected"
-          }, "api.scheduler");
+          }, "api.daily-cleanup");
         } else {
-          logger.info(`Product deleted by scheduler: ${productId}`, { productId }, "api.scheduler");
+          logger.info(`Daily cleanup: Product deleted: ${productId}`, { productId }, "api.daily-cleanup");
         }
       } catch (deleteError) {
-        logger.error(`Error deleting product: ${productId}`, { productId, error: deleteError }, "api.scheduler");
+        logger.error(`Daily cleanup error deleting product: ${productId}`, { 
+          productId, 
+          error: deleteError 
+        }, "api.daily-cleanup");
       }
     }
 
-    // Next run time (5 minutes later)
-    const nextRun = new Date(Date.now() + 5 * 60 * 1000);
-
-    // Log record
-    logger.info(`Scheduler ran: ${deletedCount} products deleted`, { 
+    // Log daily cleanup completion
+    logger.info(`Daily cleanup completed: ${deletedCount}/${totalScanned} products deleted`, { 
       deletedCount, 
-      nextRun: nextRun.toISOString() 
-    }, "api.scheduler");
+      totalScanned,
+      timestamp: new Date().toISOString()
+    }, "api.daily-cleanup");
 
-    return json<SchedulerResponse>({
+    return json<DailyCleanupResponse>({
       success: true,
       deletedCount,
-      message: `${deletedCount} geçici ürün otomatik olarak silindi`,
-      nextRun: nextRun.toISOString(),
+      totalScanned,
+      message: `Günlük temizlik tamamlandı: ${deletedCount}/${totalScanned} geçici ürün silindi`,
     });
 
   } catch (error) {
-    logger.error("Zamanlayıcı hatası", { error }, "api.scheduler");
+    logger.error("Günlük temizlik hatası", { error }, "api.daily-cleanup");
     
-    return json<SchedulerResponse>({
+    return json<DailyCleanupResponse>({
       success: false,
       deletedCount: 0,
-      message: "Zamanlayıcı sırasında hata oluştu",
+      totalScanned: 0,
+      message: "Günlük temizlik sırasında hata oluştu",
       error: error instanceof Error ? error.message : "Bilinmeyen hata",
     }, { status: 500 });
   }
 };
 
-// GET endpoint for manual trigger
+// GET endpoint for daily cleanup status
 export const loader = async ({ request }: ActionFunctionArgs) => {
   try {
     const { admin } = await authenticate.admin(request);
     
-    // Get temporary product count
+    // Get all temporary products
     const products = await admin.rest.get({
       path: "products",
       query: {
         limit: "250",
-        status: "active",
-        tag: "temporary"
+        status: "any",
+        tag: "geçici"
       }
     });
 
@@ -154,7 +150,7 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
       return isTemporaryMetafield?.value === "true";
     });
 
-    // Count expired products
+    // Count expired products (older than 2 hours)
     const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
     const expiredCount = temporaryProducts.filter((product: any) => {
       const expiresAtMetafield = product.metafields?.find(
@@ -167,19 +163,34 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
       return false;
     }).length;
 
+    // Count very old products (older than 24 hours)
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const veryOldCount = temporaryProducts.filter((product: any) => {
+      const createdAtMetafield = product.metafields?.find(
+        (meta: any) => meta.key === "created_at"
+      );
+      if (createdAtMetafield?.value) {
+        const createdAt = new Date(createdAtMetafield.value);
+        return createdAt < twentyFourHoursAgo;
+      }
+      return false;
+    }).length;
+
     return json({
       success: true,
       totalTemporaryProducts: temporaryProducts.length,
       expiredProducts: expiredCount,
-      nextCleanup: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+      veryOldProducts: veryOldCount,
+      lastDailyCleanup: new Date().toISOString(),
+      nextRecommendedCleanup: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     });
 
   } catch (error) {
-    logger.error("Zamanlayıcı durum hatası", { error }, "api.scheduler");
+    logger.error("Günlük temizlik durum hatası", { error }, "api.daily-cleanup");
     
     return json({
       success: false,
-      error: "Zamanlayıcı durumu alınırken hata oluştu",
+      error: "Günlük temizlik durumu alınırken hata oluştu",
     }, { status: 500 });
   }
 };

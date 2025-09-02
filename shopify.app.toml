@@ -1,6 +1,6 @@
 name = "Dinamik Fiyat Hesaplayıcı"
 client_id = "ace3bfc493ea0b4df835573bd32b189d"
-application_url = "http://localhost:3000"
+application_url = "https://dynamic-pricing-test-store.myshopify.com"
 embedded = true
 
 [access_scopes]
@@ -8,9 +8,9 @@ scopes = "read_products,write_products,read_themes,write_themes,read_orders,writ
 
 [auth]
 redirect_urls = [
-  "http://localhost:3000/auth/callback",
-  "http://localhost:3000/auth/shopify/callback",
-  "http://localhost:3000/api/auth/callback"
+  "https://dynamic-pricing-test-store.myshopify.com/auth/callback",
+  "https://dynamic-pricing-test-store.myshopify.com/auth/shopify/callback",
+  "https://dynamic-pricing-test-store.myshopify.com/api/auth/callback"
 ]
 
 [webhooks]

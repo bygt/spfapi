@@ -72,6 +72,33 @@ export default function Index() {
             </div>
           </div>
 
+          {/* Sistem Durumu */}
+          <div className="mt-8 bg-purple-50 p-6 rounded-lg">
+            <h3 className="text-xl font-semibold text-purple-900 mb-4">
+              🔧 Sistem Durumu
+            </h3>
+            <div className="grid md:grid-cols-2 gap-4 text-sm">
+              <div className="text-center">
+                <div className="bg-purple-200 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <span className="text-purple-800 font-bold">⏰</span>
+                </div>
+                <p className="text-purple-800">Otomatik Temizlik: 5 dakikada bir</p>
+              </div>
+              <div className="text-center">
+                <div className="bg-purple-200 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <span className="text-purple-800 font-bold">🗑️</span>
+                </div>
+                <p className="text-purple-800">Günlük Temizlik: 24 saatte bir</p>
+              </div>
+            </div>
+            <div className="mt-4 text-center">
+              <a href="/api/daily-cleanup" 
+                 className="inline-block bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition-colors">
+                Günlük Temizlik Durumu
+              </a>
+            </div>
+          </div>
+
           {/* Hızlı Başlangıç */}
           <div className="mt-8 bg-yellow-50 p-6 rounded-lg">
             <h3 className="text-xl font-semibold text-yellow-900 mb-4">

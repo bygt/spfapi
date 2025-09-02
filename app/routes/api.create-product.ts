@@ -38,6 +38,40 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       }, { status: 400 });
     }
 
+    // Duplicate prevention: Check if similar product already exists (last 5 minutes)
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const existingProducts = await admin.rest.get({
+      path: "products",
+      query: {
+        limit: "250",
+        status: "any",
+        tag: "geçici",
+        created_at_min: fiveMinutesAgo.toISOString()
+      }
+    });
+
+    const existingProductsData = await existingProducts.json();
+    const duplicateProduct = existingProductsData.products.find((product: any) => {
+      const widthMeta = product.metafields?.find((meta: any) => meta.key === "width");
+      const heightMeta = product.metafields?.find((meta: any) => meta.key === "height");
+      const materialMeta = product.metafields?.find((meta: any) => meta.key === "material");
+      
+      return widthMeta?.value === width.toString() &&
+             heightMeta?.value === height.toString() &&
+             materialMeta?.value === material;
+    });
+
+    if (duplicateProduct) {
+      logger.info(`Duplicate product creation prevented: ${width}x${height} ${material}`, {
+        width, height, material, existingProductId: duplicateProduct.id
+      }, "api.create-product");
+      
+      return json<CreateProductResponse>({
+        success: false,
+        error: "Aynı özelliklerde ürün yakın zamanda oluşturulmuş. Lütfen birkaç dakika bekleyin.",
+      }, { status: 409 }); // Conflict status
+    }
+
     // Temporary product name
     const productTitle = `Çerçeve ${width}×${height} - ${material.charAt(0).toUpperCase() + material.slice(1)}`;
     
